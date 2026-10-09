@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#f2f8f4" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#0c1a12" media="(prefers-color-scheme: dark)" />
+  <script>try{var t=localStorage.getItem("mymcqs-theme")||"light";document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","light");}</script>
   <link rel="icon" href="data:," />
   <title>My MCQs — PPSC Test Preparation</title>
   <meta name="description" content="My MCQs — free PPSC test preparation. Subject-wise MCQs, exam simulator and community uploads. No login required." />
@@ -32,8 +33,7 @@
       --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       --tabbar-h: 68px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
+    :root[data-theme="dark"] {
         --bg: #0c1a12;
         --surface: #12241a;
         --surface-2: #1a3325;
@@ -51,8 +51,7 @@
         --correct-soft: #173f28;
         --shadow: 0 16px 40px rgba(0, 0, 0, .30);
       }
-    }
-    * { box-sizing: border-box; }
+}    * { box-sizing: border-box; }
     html { -webkit-tap-highlight-color: transparent; }
     body {
       margin: 0; min-height: 100vh; min-height: 100dvh;
@@ -232,6 +231,10 @@
     .set-row .rtx b{display:block; font-size:.92rem;}
     .set-row .rtx small{color:var(--muted); font-size:.74rem;}
     .set-row .rchev{color:var(--muted); font-size:1.35rem; font-weight:700;}
+    .switch{width:46px;height:26px;border-radius:999px;background:var(--line);position:relative;transition:background .2s;flex:0 0 auto;}
+    .switch .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s;}
+    .switch.on{background:var(--primary);}
+    .switch.on .knob{left:23px;}
     .set-panel{display:none; padding:4px 18px 18px;}
     .set-panel.open{display:block;}
     .dropzone{display:flex; flex-direction:column; align-items:center; gap:8px; border:2px dashed var(--line); border-radius:16px; padding:28px 18px; cursor:pointer; text-align:center; margin:6px 0 14px; background:var(--bg);}
@@ -327,6 +330,15 @@
       <p class="eyebrow">Settings</p>
       <h1 class="hero-title">Settings</h1>
       <p class="hero-sub">Contribute questions, manage uploads and learn about the app.</p>
+
+      <div class="set-group">
+        <h3>Appearance</h3>
+        <button class="set-row" id="themeRow">
+          <span class="ric">🌙</span>
+          <span class="rtx"><b>Dark Mode</b><small>Switch between light and dark theme</small></span>
+          <span class="switch" id="themeSwitch"><span class="knob"></span></span>
+        </button>
+      </div>
 
       <div class="set-group">
         <h3>Contribute</h3>
@@ -855,6 +867,27 @@
     });
 
     /* ---------- Settings: CSV file upload ---------- */
+    /* ---------- theme (default light) ---------- */
+    function applyAppTheme(t){
+      document.documentElement.setAttribute("data-theme", t);
+      var sw = document.getElementById("themeSwitch");
+      if(sw) sw.classList.toggle("on", t === "dark");
+      var row = document.getElementById("themeRow");
+      if(row){ var ic = row.querySelector(".ric"); if(ic) ic.textContent = (t === "dark") ? "\u2600\uFE0F" : "\uD83C\uDF19"; }
+    }
+    function initTheme(){
+      var t = "light";
+      try{ t = localStorage.getItem("mymcqs-theme") || "light"; }catch(e){}
+      if(t !== "dark") t = "light";
+      applyAppTheme(t);
+      var row = document.getElementById("themeRow");
+      if(row) row.addEventListener("click", function(){
+        var cur = (document.documentElement.getAttribute("data-theme") === "dark") ? "light" : "dark";
+        try{ localStorage.setItem("mymcqs-theme", cur); }catch(e){}
+        applyAppTheme(cur);
+      });
+    }
+
     (function initFileUpload(){
       var sel = el("file_subject");
       SUBJECTS.forEach(function(s){
@@ -1041,6 +1074,7 @@
     el("homePracticeBtn").addEventListener("click", function(){ showScreen("screen-subjects"); });
     el("homeSimBtn").addEventListener("click", function(){ showScreen("screen-sim"); });
     el("homeViewAll").addEventListener("click", function(){ showScreen("screen-subjects"); });
+    initTheme();
     renderHome();
     renderSubjects();
     renderSimSetup();
