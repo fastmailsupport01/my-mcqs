@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f2f8f4" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0c1a12" media="(prefers-color-scheme: dark)" />
+  <link rel="icon" href="data:," />
+  <title>My MCQs — PPSC Test Preparation</title>
+  <meta name="description" content="My MCQs — free PPSC test preparation. Subject-wise MCQs, exam simulator and community uploads. No login required." />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f2f8f4;
+      --surface: #ffffff;
+      --surface-2: #e4f2e8;
+      --ink: #0f1e3d;
+      --muted: #5b6b8c;
+      --line: #d3e5d8;
+      --primary: #16a34a;
+      --primary-strong: #15803d;
+      --primary-soft: #dcf5e5;
+      --amber: #f59e0b;
+      --amber-soft: #fdf0d5;
+      --danger: #c24141;
+      --danger-soft: #fbe3e0;
+      --correct: #15803d;
+      --correct-soft: #e2f5e9;
+      --shadow: 0 12px 34px rgba(22, 163, 74, .10);
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --tabbar-h: 68px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1a12;
+        --surface: #12241a;
+        --surface-2: #1a3325;
+        --ink: #eaf7ee;
+        --muted: #9fb8a8;
+        --line: #24402f;
+        --primary: #4ade80;
+        --primary-strong: #86efac;
+        --primary-soft: #143d24;
+        --amber: #fbbf24;
+        --amber-soft: #4a3a12;
+        --danger: #ff8d85;
+        --danger-soft: #4a2827;
+        --correct: #5fd68a;
+        --correct-soft: #173f28;
+        --shadow: 0 16px 40px rgba(0, 0, 0, .30);
+      }
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; min-height: 100vh; min-height: 100dvh;
+      background: var(--bg); color: var(--ink);
+      font-family: var(--font); line-height: 1.5;
+    }
+    button { font: inherit; }
+    .app { width: min(100%, 720px); margin: 0 auto; padding: 20px 16px calc(var(--tabbar-h) + 28px); }
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadein .18s ease; }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Brand header */
+    .brandbar { display: flex; align-items: center; gap: 12px; margin: 4px 0 18px; }
+    .brandmark { width: 44px; height: 44px; border-radius: 12px; background: var(--primary); display: grid; place-items: center; flex: 0 0 auto; }
+    .brandmark svg { width: 26px; height: 26px; }
+    .brandbar b { font-size: 1.35rem; letter-spacing: -.03em; display: block; line-height: 1.1; }
+    .brandbar span { color: var(--muted); font-size: .75rem; font-weight: 600; }
+
+    .eyebrow { color: var(--primary); font-size: .76rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 6px; }
+    h1.hero-title { font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.08; letter-spacing: -.03em; margin: 0 0 8px; }
+    .hero-sub { color: var(--muted); font-size: .95rem; margin: 0 0 20px; }
+
+    .section-head { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 0 12px; }
+    .section-head h2 { font-size: 1.05rem; margin: 0; letter-spacing: -.02em; }
+    .section-head span { color: var(--muted); font-size: .8rem; }
+
+    .subjects { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .subject-card {
+      --tone: var(--primary-soft);
+      text-align: left; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+      border-radius: 18px; padding: 16px; min-height: 138px; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .subject-card:active { transform: translateY(1px); }
+    .subject-card::after { content: ""; position: absolute; width: 70px; height: 70px; border-radius: 50%; right: -22px; bottom: -26px; background: var(--tone); }
+    .subject-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: var(--tone); color: var(--primary-strong); margin-bottom: 16px; }
+    .subject-icon svg { width: 22px; height: 22px; stroke: currentColor; }
+    .subject-card strong { display: block; font-size: .95rem; line-height: 1.25; }
+    .subject-card small { color: var(--muted); font-size: .74rem; display: block; margin-top: 4px; }
+    .count-badge { display: inline-block; margin-top: 8px; font-size: .72rem; font-weight: 800; color: var(--primary-strong); background: var(--primary-soft); border-radius: 999px; padding: 3px 10px; }
+
+    .loading-card { border: 1px dashed var(--line); border-radius: 18px; padding: 28px; text-align: center; color: var(--muted); grid-column: 1 / -1; }
+    .spinner { width: 30px; height: 30px; margin: 0 auto 10px; border: 3px solid var(--line); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .info-strip { margin-top: 16px; display: grid; grid-template-columns: 1fr; border: 1px solid var(--line); background: var(--surface); border-radius: 16px; overflow: hidden; }
+    .info-item { padding: 14px 16px; display: flex; gap: 10px; align-items: center; }
+    .info-item + .info-item { border-top: 1px solid var(--line); }
+    .info-item svg { width: 18px; height: 18px; color: var(--primary); flex: 0 0 auto; }
+    .info-item b { display: block; font-size: .82rem; }
+    .info-item span { color: var(--muted); font-size: .74rem; }
+
+    /* Practice */
+    .quiz-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .subject-pick { flex: 1; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font-weight: 700; font-size: .9rem; }
+    .score-strip { display: flex; gap: 8px; margin-bottom: 14px; }
+    .score-strip .chip { flex: 1; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 6px; text-align: center; font-size: .72rem; color: var(--muted); }
+    .score-strip .chip b { display: block; font-size: 1.05rem; color: var(--ink); }
+    .q-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+    .q-top { display: flex; justify-content: space-between; font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--primary); margin-bottom: 8px; }
+    .q-top span:last-child { color: var(--muted); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .q-text { font-size: 1.02rem; font-weight: 650; margin: 0 0 14px; line-height: 1.4; }
+    .opts { display: grid; gap: 8px; }
+    .opt {
+      display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+      padding: 12px; border: 1.5px solid var(--line); border-radius: 12px;
+      background: var(--bg); color: var(--ink); cursor: pointer; font-size: .9rem; font-weight: 600;
+    }
+    .opt:active:not(:disabled) { border-color: var(--primary); }
+    .opt:disabled { cursor: default; }
+    .opt .tick { margin-left: auto; font-weight: 800; width: 20px; text-align: center; }
+    .opt.correct { border-color: var(--correct); background: var(--correct-soft); }
+    .opt.correct .tick { color: var(--correct); }
+    .opt.wrong { border-color: var(--danger); background: var(--danger-soft); }
+    .opt.wrong .tick { color: var(--danger); }
+    .explain { display: none; margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); color: var(--muted); font-size: .84rem; }
+    .explain.show { display: block; }
+    .explain strong { color: var(--ink); }
+
+    .pager { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 18px 0 10px; }
+    .pg-btn { min-width: 40px; height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font-weight: 700; cursor: pointer; }
+    .pg-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .pg-btn:disabled { opacity: .35; }
+    .pg-dots { align-self: center; color: var(--muted); padding: 0 4px; }
+    .pg-goto { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; }
+    .pg-goto input { width: 170px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: .9rem; font-family: inherit; background: var(--surface); color: var(--ink); }
+    .btn { border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 800; cursor: pointer; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-amber { background: var(--amber); color: #3a2a05; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: .5; }
+
+    /* Simulator */
+    .result-card { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 28px 22px; box-shadow: var(--shadow); text-align: center; }
+    .sim-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 18px 0 22px; }
+    .sim-meta > div { background: var(--surface-2); border-radius: 12px; padding: 12px 8px; font-size: .74rem; color: var(--muted); }
+    .sim-meta b { display: block; font-size: 1.15rem; color: var(--ink); }
+    .badge { display: inline-block; border-radius: 999px; padding: 6px 16px; font-weight: 800; font-size: .8rem; }
+    .badge.live { background: var(--correct-soft); color: var(--correct); }
+    .badge.soon { background: var(--danger-soft); color: var(--danger); }
+    .q-timer { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--primary); }
+    .q-timer.warn { color: var(--danger); }
+    .q-nav { display: flex; gap: 10px; margin-top: 16px; }
+    .q-nav .btn { flex: 1; }
+    .progress { height: 7px; background: var(--surface-2); border-radius: 9px; overflow: hidden; margin-bottom: 14px; }
+    .progress i { display: block; height: 100%; background: var(--primary); border-radius: inherit; transition: width .2s ease; }
+    .review-list { display: grid; gap: 10px; margin-top: 14px; text-align: left; }
+    .review-item { border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 14px; font-size: .86rem; }
+    .review-item > b { display: block; margin-bottom: 6px; }
+    .result-score { font-size: 2.2rem; font-weight: 800; letter-spacing: -.03em; margin: 10px 0; }
+    .result-meta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 16px 0 22px; }
+    .result-meta > div { background: var(--surface-2); border-radius: 12px; padding: 10px 6px; font-size: .72rem; color: var(--muted); }
+    .result-meta b { display: block; font-size: 1.05rem; color: var(--ink); }
+
+    /* Upload form */
+    .form-card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 22px 18px; box-shadow: var(--shadow); }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-weight: 700; margin-bottom: 7px; font-size: .88rem; }
+    .field label small { font-weight: 400; color: var(--muted); }
+    .field input[type=text], .field textarea, .field select { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; font-size: .92rem; font-family: inherit; background: var(--bg); color: var(--ink); }
+    .field textarea { min-height: 96px; resize: vertical; }
+    .opt-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 420px) { .opt-row { grid-template-columns: 1fr; } }
+    .radio-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .radio-pill { display: flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); border-radius: 999px; padding: 9px 18px; cursor: pointer; font-weight: 800; }
+    .radio-pill input { accent-color: var(--primary); width: 16px; height: 16px; }
+    .radio-pill:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+    .form-msg { display: none; border-radius: 12px; padding: 14px 16px; font-weight: 600; margin-bottom: 18px; font-size: .9rem; }
+    .form-msg.ok { display: block; background: var(--correct-soft); border: 1px solid var(--correct); color: var(--correct); }
+    .form-msg.err { display: block; background: var(--danger-soft); border: 1px solid var(--danger); color: var(--danger); }
+
+    /* About */
+    .page-block { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px 20px; box-shadow: var(--shadow); }
+    .page-block h2 { margin: 0 0 12px; letter-spacing: -.02em; }
+    .page-block p, .page-block li { color: var(--muted); font-size: .92rem; }
+    .page-block ul { padding-left: 20px; }
+    .page-block li { margin-bottom: 8px; }
+    .credit-line { text-align: center; color: var(--muted); font-size: .78rem; margin: 26px 0 6px; }
+    .credit-line .credit { font-weight: 800; color: var(--ink); }
+
+    /* Bottom tab bar — bank-APK style: floating, centred, Settings on the right */
+    .tabbar{
+      position:fixed; left:12px; right:12px; bottom:calc(10px + env(safe-area-inset-bottom)); z-index:50;
+      max-width:480px; margin:0 auto;
+      background:var(--surface); border:1px solid var(--line); border-radius:22px;
+      box-shadow:0 14px 40px rgba(15,30,61,.18);
+      padding:8px 6px;
+      display:grid; grid-template-columns:repeat(4,1fr);
+    }
+    .tab{border:0; background:none; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:3px; font-size:.64rem; font-weight:700; cursor:pointer; padding:8px 2px; border-radius:16px;}
+    .tab svg{width:23px; height:23px; stroke:currentColor;}
+    .tab.active{color:var(--primary-strong); background:var(--primary-soft);}
+    .tab:active{transform:scale(.96);}
+
+    /* Subject list rows (bank-app style, not cards) */
+    .slist{display:grid; border:1px solid var(--line); background:var(--surface); border-radius:18px; overflow:hidden; box-shadow:var(--shadow);}
+    .srow{display:flex; align-items:center; gap:13px; width:100%; text-align:left; padding:14px 16px; background:none; border:0; border-bottom:1px solid var(--line); color:var(--ink); cursor:pointer; font:inherit;}
+    .srow:last-child{border-bottom:0;}
+    .srow:active{background:var(--surface-2);}
+    .srow .ric{width:42px; height:42px; border-radius:13px; background:var(--primary-soft); display:grid; place-items:center; font-size:1.3rem; flex:0 0 auto;}
+    .srow .rtx{flex:1; min-width:0;}
+    .srow .rtx b{display:block; font-size:.94rem;}
+    .srow .rtx small{color:var(--muted); font-size:.74rem; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+    .srow .rcount{font-size:.7rem; font-weight:800; color:var(--primary-strong); background:var(--primary-soft); border-radius:999px; padding:4px 11px; white-space:nowrap;}
+    .srow .rcount.zero{color:var(--muted); background:var(--surface-2);}
+    .srow .rchev{color:var(--muted); font-size:1.35rem; font-weight:700;}
+    .srow.dim{opacity:.55;}
+
+    /* Settings groups */
+    .set-group{border:1px solid var(--line); background:var(--surface); border-radius:18px; overflow:hidden; box-shadow:var(--shadow); margin-bottom:16px;}
+    .set-group h3{margin:0; padding:14px 18px 6px; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted);}
+    .set-row{display:flex; align-items:center; gap:13px; width:100%; text-align:left; padding:15px 18px; background:none; border:0; border-top:1px solid var(--line); color:var(--ink); cursor:pointer; font:inherit;}
+    .set-row .ric{width:40px; height:40px; border-radius:12px; background:var(--primary-soft); display:grid; place-items:center; font-size:1.25rem; flex:0 0 auto;}
+    .set-row .rtx{flex:1;}
+    .set-row .rtx b{display:block; font-size:.92rem;}
+    .set-row .rtx small{color:var(--muted); font-size:.74rem;}
+    .set-row .rchev{color:var(--muted); font-size:1.35rem; font-weight:700;}
+    .set-panel{display:none; padding:4px 18px 18px;}
+    .set-panel.open{display:block;}
+    .dropzone{display:flex; flex-direction:column; align-items:center; gap:8px; border:2px dashed var(--line); border-radius:16px; padding:28px 18px; cursor:pointer; text-align:center; margin:6px 0 14px; background:var(--bg);}
+    .dropzone.drag{border-color:var(--amber);}
+    .dz-icon{font-size:34px;}
+    .dz-text{color:var(--muted); font-size:.88rem;}
+    .dz-text strong{color:var(--ink);}
+    .dz-file{color:var(--primary-strong); font-size:.82rem; font-weight:700; word-break:break-all;}
+    .csv-help{background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:10px 14px; margin-bottom:14px; color:var(--muted); font-size:.8rem;}
+    .csv-help summary{cursor:pointer; font-weight:700; color:var(--ink);}
+    .csv-help code{background:var(--surface); border:1px solid var(--line); padding:2px 8px; border-radius:6px; font-size:.76rem; display:inline-block; margin:6px 0; word-break:break-all;}
+    .file-progress{height:7px; background:var(--surface-2); border-radius:9px; overflow:hidden; margin:12px 0;}
+    .file-progress i{display:block; height:100%; background:var(--primary); border-radius:inherit; transition:width .2s ease;}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="brandbar">
+      <span class="brandmark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m4.5 12.5 5 5 10-11"/></svg>
+      </span>
+      <div><b>My MCQs</b><span>PPSC Test Preparation</span></div>
+    </div>
+
+    <!-- HOME -->
+    <section id="screen-home" class="screen active" aria-label="Home">
+      <p class="eyebrow">PPSC Practice Bank</p>
+      <h1 class="hero-title">Practice PPSC MCQs, the smart way.</h1>
+      <p class="hero-sub">Pick a subject, attempt questions, and see answers with explanations instantly. Free forever — no login needed.</p>
+      <div class="score-strip" style="margin-bottom:18px">
+        <div class="chip">Total MCQs<b id="totalCountLabel">…</b></div>
+        <div class="chip">Subjects<b>10</b></div>
+        <div class="chip">Simulator<b>100 Qs</b></div>
+      </div>
+      <div class="q-nav" style="margin-top:0;margin-bottom:20px">
+        <button class="btn btn-primary" id="homePracticeBtn">Browse Subjects</button>
+        <button class="btn btn-amber" id="homeSimBtn">Start Simulator</button>
+      </div>
+      <div class="section-head">
+        <h2>Popular subjects</h2>
+        <span id="homeViewAll" style="color:var(--primary);font-weight:700;cursor:pointer">View all ›</span>
+      </div>
+      <div class="slist" id="homeSubjectList">
+        <div class="loading-card"><div class="spinner"></div>Loading…</div>
+      </div>
+      <div class="info-strip" aria-label="App features" style="margin-top:18px">
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/></svg>
+          <div><b>Instant answers</b><span>Tap an option — answer + explanation appears</span></div>
+        </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>
+          <div><b>Real PPSC simulator</b><span>100 MCQs · 90 min · negative marking</span></div>
+        </div>
+        <div class="info-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V8m0 0-4 4m4-4 4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+          <div><b>Community uploads</b><span>Submit your MCQs — reviewed before going live</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBJECTS (list) -->
+    <section id="screen-subjects" class="screen" aria-label="Subjects">
+      <p class="eyebrow">Study Library</p>
+      <h1 class="hero-title">Choose a subject</h1>
+      <p class="hero-sub">Tap any subject to open its practice questions.</p>
+      <div class="slist" id="subjectList">
+        <div class="loading-card"><div class="spinner"></div>Loading subjects…</div>
+      </div>
+    </section>
+
+    <!-- PRACTICE -->
+    <section id="screen-practice" class="screen" aria-label="Practice">
+      <p class="eyebrow">Practice Mode</p>
+      <h1 class="hero-title" id="practiceTitle">Practice</h1>
+      <p class="hero-sub">Attempt each question — the answer and explanation reveal after you choose.</p>
+      <div class="quiz-top">
+        <select class="subject-pick" id="practiceSubject" aria-label="Choose subject"></select>
+      </div>
+      <div id="practiceBox"><div class="loading-card"><div class="spinner"></div>Loading question bank…</div></div>
+    </section>
+
+    <!-- SIMULATOR -->
+    <section id="screen-sim" class="screen" aria-label="Exam simulator">
+      <p class="eyebrow">PPSC Simulator</p>
+      <h1 class="hero-title">One-Paper Mock Exam</h1>
+      <p class="hero-sub">100 random PPSC questions, 90 minutes, −0.25 per wrong answer — just like the real exam.</p>
+      <div id="simBox"><div class="loading-card"><div class="spinner"></div>Loading question bank…</div></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="screen-settings" class="screen" aria-label="Settings">
+      <p class="eyebrow">Settings</p>
+      <h1 class="hero-title">Settings</h1>
+      <p class="hero-sub">Contribute questions, manage uploads and learn about the app.</p>
+
+      <div class="set-group">
+        <h3>Contribute</h3>
+        <button class="set-row" data-panel="panelMcq">
+          <span class="ric">📝</span>
+          <span class="rtx"><b>Upload MCQ</b><small>Submit one question — reviewed before going live</small></span>
+          <span class="rchev">›</span>
+        </button>
+        <div class="set-panel" id="panelMcq">
+          <div class="form-card" style="box-shadow:none;margin-top:12px">
+            <div class="form-msg" id="formMsg"></div>
+            <form id="uploadForm" novalidate>
+              <div class="field">
+                <label for="f_name">Your name <small>(optional)</small></label>
+                <input type="text" id="f_name" maxlength="80" placeholder="e.g. Ali Raza" autocomplete="name" />
+              </div>
+              <div class="field">
+                <label for="f_subject">Subject *</label>
+                <select id="f_subject"><option value="">— Choose subject —</option></select>
+              </div>
+              <div class="field">
+                <label for="f_question">Question *</label>
+                <textarea id="f_question" maxlength="2000" placeholder="Type the MCQ question here…"></textarea>
+              </div>
+              <div class="opt-row">
+                <div class="field"><label for="f_a">Option A *</label><input type="text" id="f_a" maxlength="500" /></div>
+                <div class="field"><label for="f_b">Option B *</label><input type="text" id="f_b" maxlength="500" /></div>
+                <div class="field"><label for="f_c">Option C *</label><input type="text" id="f_c" maxlength="500" /></div>
+                <div class="field"><label for="f_d">Option D *</label><input type="text" id="f_d" maxlength="500" /></div>
+              </div>
+              <div class="field">
+                <label>Correct answer *</label>
+                <div class="radio-row">
+                  <label class="radio-pill"><input type="radio" name="correct" value="A" /> A</label>
+                  <label class="radio-pill"><input type="radio" name="correct" value="B" /> B</label>
+                  <label class="radio-pill"><input type="radio" name="correct" value="C" /> C</label>
+                  <label class="radio-pill"><input type="radio" name="correct" value="D" /> D</label>
+                </div>
+              </div>
+              <div class="field">
+                <label for="f_explain">Explanation <small>(optional)</small></label>
+                <textarea id="f_explain" maxlength="2000" placeholder="Why is this the correct answer?"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" id="submitBtn" style="width:100%">Submit MCQ</button>
+            </form>
+          </div>
+        </div>
+        <button class="set-row" data-panel="panelFile">
+          <span class="ric">📄</span>
+          <span class="rtx"><b>Upload File</b><small>Bulk-upload MCQs from a CSV file</small></span>
+          <span class="rchev">›</span>
+        </button>
+        <div class="set-panel" id="panelFile">
+          <div class="form-card" style="box-shadow:none;margin-top:12px">
+            <div class="field">
+              <label for="file_subject">Subject *</label>
+              <select id="file_subject"><option value="">— Choose subject —</option></select>
+            </div>
+            <label class="dropzone" id="dropZone">
+              <input type="file" id="fileInput" accept=".csv,text/csv" hidden />
+              <span class="dz-icon">📄</span>
+              <span class="dz-text"><strong>Choose a CSV file</strong> or tap here</span>
+              <span class="dz-file" id="dzFile"></span>
+            </label>
+            <details class="csv-help">
+              <summary>CSV format</summary>
+              <p>Columns in order (header row optional):</p>
+              <code>question, option_a, option_b, option_c, option_d, correct_option, explanation</code>
+            </details>
+            <button class="btn btn-primary" id="fileUploadBtn" style="width:100%" disabled>Upload File</button>
+            <div class="file-progress" id="fileProg" hidden><i id="fileProgBar" style="width:0"></i></div>
+            <div class="form-msg" id="fileMsg" style="margin-top:12px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-group">
+        <h3>About</h3>
+        <button class="set-row" data-panel="panelAbout">
+          <span class="ric">ℹ️</span>
+          <span class="rtx"><b>About My MCQs</b><small>Mission, contact and privacy</small></span>
+          <span class="rchev">›</span>
+        </button>
+        <div class="set-panel" id="panelAbout">
+          <div class="page-block" style="box-shadow:none;margin-top:12px">
+            <h2>Free PPSC preparation for everyone</h2>
+            <p><strong>My MCQs</strong> is a free test-preparation app for PPSC aspirants: subject-wise MCQ practice with instant answers, a true exam simulator (100 MCQs, 90 minutes, −0.25 negative marking), solved past papers and community uploads.</p>
+            <p>📞 <strong>+923264025618</strong></p>
+            <p style="font-size:.8rem">No accounts, no tracking profiles. My MCQs is an independent educational platform, not affiliated with PPSC or any government body.</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="credit-line">Developer: <span class="credit">cos</span> - +923264025618</p>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Main navigation">
+    <button class="tab active" data-screen="screen-home" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1Z"/></svg>
+      Home
+    </button>
+    <button class="tab" data-screen="screen-subjects" aria-label="Subjects">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1.4"/><circle cx="4" cy="12" r="1.4"/><circle cx="4" cy="18" r="1.4"/></svg>
+      Subjects
+    </button>
+    <button class="tab" data-screen="screen-sim" aria-label="Simulator">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+      Simulator
+    </button>
+    <button class="tab" data-screen="screen-settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.05a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1Z"/></svg>
+      Settings
+    </button>
+  </nav>
+
+  <script>
+  (function(){
+    "use strict";
+
+    /* ---------- Supabase ---------- */
+    var SUPABASE_URL = "https://alseymlabjjyvsfwgajq.supabase.co";
+    var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsc2V5bWxhYmpqeXZzZndnYWpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NTcyMDYsImV4cCI6MjEwNzEzMzIwNn0.7tZoUVUWMZF554uIuOkwBY1tkeVP0Xud5_7GFwMz3IU";
+    var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* ---------- Subjects (PPSC-only) ---------- */
+    var SUBJECTS = [
+      {slug:"computer-science",  name:"Computer Science",   icon:"computer"},
+      {slug:"english",           name:"English",            icon:"book"},
+      {slug:"urdu",              name:"Urdu",               icon:"language"},
+      {slug:"islamiyat",         name:"Islamiyat",          icon:"crescent"},
+      {slug:"everyday-science",  name:"Everyday Science",   icon:"science"},
+      {slug:"pak-study",         name:"Pak Study",          icon:"flag"},
+      {slug:"general-knowledge", name:"General Knowledge",  icon:"globe"},
+      {slug:"current-affairs",   name:"Current Affairs",    icon:"news"},
+      {slug:"basic-mathematics", name:"Basic Mathematics",  icon:"math"},
+      {slug:"past-papers",       name:"Past Papers",        icon:"paper"}
+    ];
+    var ICONS = {
+      computer:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8m-4-4v4"/></svg>',
+      book:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z"/><path d="M8 7h8m-8 4h6"/></svg>',
+      language:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 5h7M7.5 3v2m0 0a10 10 0 0 1-3 6m3-6a9 9 0 0 0 3 6m2 8 4-10 4 10m-6.7-3h5.4"/></svg>',
+      crescent:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 15.5A9 9 0 1 1 8.5 4a7 7 0 0 0 11.5 11.5Z"/></svg>',
+      science:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 3h6m-5 0v6l-5 9a2 2 0 0 0 1.8 3h10.4a2 2 0 0 0 1.8-3l-5-9V3"/><path d="M7 16h10"/></svg>',
+      flag:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 21V4m0 1h11l-2 3 2 3H5"/></svg>',
+      globe:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+      news:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 5h13v14H4zM17 8h3v9a2 2 0 0 1-2 2h-1M7 9h7M7 13h3m2 0h2M7 16h7"/></svg>',
+      math:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 4H6l6 8-6 8h12"/></svg>',
+      paper:'<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h6m-6 4h6"/></svg>'
+    };
+
+    /* ---------- Helpers ---------- */
+    function el(id){ return document.getElementById(id); }
+    function esc(s){
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+      });
+    }
+    function shuffle(arr){
+      var a = arr.slice();
+      for(var i = a.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+    function toOptions(m){
+      return shuffle([
+        {k:"A", t:m.option_a}, {k:"B", t:m.option_b},
+        {k:"C", t:m.option_c}, {k:"D", t:m.option_d}
+      ]);
+    }
+    function showScreen(id){
+      document.querySelectorAll(".screen").forEach(function(s){
+        s.classList.toggle("active", s.id === id);
+      });
+      // practice is a drill-down from Subjects — highlight the Subjects tab for it
+      var tabId = (id === "screen-practice") ? "screen-subjects" : id;
+      document.querySelectorAll(".tab").forEach(function(t){
+        t.classList.toggle("active", t.getAttribute("data-screen") === tabId);
+      });
+      window.scrollTo(0, 0);
+    }
+
+    /* ---------- Data: fetch the FULL PPSC bank in 1000-row chunks ---------- */
+    var ALL_MCQS = [];
+    var dataReady = false, dataError = null;
+    var COLS = "id,question,option_a,option_b,option_c,option_d,correct_option,explanation,subject_slug";
+    function fetchAllMCQs(){
+      var CHUNK = 1000, all = [], offset = 0;
+      function next(){
+        return sb.from("mcqs").select(COLS)
+          .or("exam_body.eq.ppsc,exam_body.is.null")
+          .order("id", {ascending:true})
+          .range(offset, offset + CHUNK - 1)
+          .then(function(res){
+            if(res.error) throw res.error;
+            all = all.concat(res.data || []);
+            if((res.data || []).length === CHUNK){ offset += CHUNK; return next(); }
+            return all;
+          });
+      }
+      return next();
+    }
+    function subjectCount(slug){
+      var n = 0;
+      for(var i = 0; i < ALL_MCQS.length; i++) if(ALL_MCQS[i].subject_slug === slug) n++;
+      return n;
+    }
+
+    /* ---------- Tabs ---------- */
+    document.querySelectorAll(".tab").forEach(function(t){
+      t.addEventListener("click", function(){ showScreen(t.getAttribute("data-screen")); });
+    });
+
+    /* ---------- Home: stats + popular subjects list ---------- */
+    function subjectRowHTML(s, n){
+      return '<span class="ric">' + ICONS[s.icon] + '</span>'
+        + '<span class="rtx"><b>' + esc(s.name) + '</b></span>'
+        + '<span class="rcount' + (n ? "" : " zero") + '">' + (n ? n.toLocaleString() + " MCQs" : "Soon") + '</span>'
+        + '<span class="rchev">›</span>';
+    }
+    function renderHome(){
+      if(!dataReady){
+        el("totalCountLabel").textContent = "…";
+        el("homeSubjectList").innerHTML = '<div class="loading-card"><div class="spinner"></div>Loading…</div>';
+        return;
+      }
+      el("totalCountLabel").textContent = ALL_MCQS.length.toLocaleString();
+      var box = el("homeSubjectList");
+      box.innerHTML = "";
+      // top 4 subjects by count
+      var top = SUBJECTS.map(function(s){ return {s:s, n:subjectCount(s.slug)}; })
+        .sort(function(a, b){ return b.n - a.n; }).slice(0, 4);
+      top.forEach(function(x){
+        var b = document.createElement("button");
+        b.className = "srow" + (x.n ? "" : " dim");
+        b.innerHTML = subjectRowHTML(x.s, x.n);
+        if(x.n) b.addEventListener("click", function(){ openPractice(x.s.slug); });
+        box.appendChild(b);
+      });
+    }
+
+    /* ---------- Subjects: full list ---------- */
+    function renderSubjects(){
+      var box = el("subjectList");
+      if(!dataReady){
+        box.innerHTML = '<div class="loading-card"><div class="spinner"></div>Loading subjects…</div>';
+        return;
+      }
+      box.innerHTML = "";
+      SUBJECTS.forEach(function(s){
+        var n = subjectCount(s.slug);
+        var b = document.createElement("button");
+        b.className = "srow" + (n ? "" : " dim");
+        b.innerHTML = subjectRowHTML(s, n);
+        if(n) b.addEventListener("click", function(){ openPractice(s.slug); });
+        box.appendChild(b);
+      });
+    }
+
+    /* ---------- Practice: 20 per page, numbered pagination ---------- */
+    var PR = { slug:null, questions:[], qopts:[], answers:{}, page:1, perPage:20 };
+
+    function openPractice(slug){
+      PR.slug = slug || PR.slug || SUBJECTS[0].slug;
+      el("practiceSubject").value = PR.slug;
+      startPractice();
+      showScreen("screen-practice");
+    }
+
+    function startPractice(){
+      var box = el("practiceBox");
+      if(!dataReady){
+        box.innerHTML = '<div class="loading-card"><div class="spinner"></div>Loading question bank…</div>';
+        return;
+      }
+      var list = ALL_MCQS.filter(function(m){ return m.subject_slug === PR.slug; });
+      var meta = SUBJECTS.filter(function(s){ return s.slug === PR.slug; })[0];
+      el("practiceTitle").textContent = (meta ? meta.name : "Practice") + " — Practice";
+      if(!list.length){
+        box.innerHTML = '<div class="loading-card">No MCQs for this subject yet — check back soon.</div>';
+        return;
+      }
+      PR.questions = shuffle(list);
+      PR.qopts = PR.questions.map(toOptions);
+      PR.answers = {};
+      PR.page = 1;
+      renderPractice();
+    }
+
+    function prScore(){
+      var a = 0, c = 0, i;
+      for(i = 0; i < PR.questions.length; i++){
+        if(PR.answers[i]){ a++; if(PR.answers[i] === PR.questions[i].correct_option) c++; }
+      }
+      return {a:a, c:c};
+    }
+
+    function pageNums(cur, total){
+      var out = [], i;
+      if(total <= 9){ for(i = 1; i <= total; i++) out.push(i); }
+      else if(cur <= 5){ for(i = 1; i <= 6; i++) out.push(i); out.push("…"); out.push(total-1); out.push(total); }
+      else if(cur >= total-4){ out.push(1); out.push("…"); for(i = total-5; i <= total; i++) out.push(i); }
+      else { out.push(1); out.push("…"); for(i = cur-2; i <= cur+2; i++) out.push(i); out.push("…"); out.push(total); }
+      return out;
+    }
+
+    function lockPracticeCard(card, qi){
+      var m = PR.questions[qi], pick = PR.answers[qi];
+      card.querySelectorAll(".opt").forEach(function(x){
+        x.disabled = true;
+        var k = x.getAttribute("data-k");
+        if(k === m.correct_option){ x.classList.add("correct"); x.querySelector(".tick").textContent = "✓"; }
+        else if(k === pick){ x.classList.add("wrong"); x.querySelector(".tick").textContent = "✗"; }
+      });
+      var ex = card.querySelector(".explain");
+      ex.innerHTML = "<strong>Explanation:</strong> " + esc(m.explanation || ("Correct answer is option " + m.correct_option + "."));
+      ex.classList.add("show");
+    }
+
+    function renderPractice(){
+      var box = el("practiceBox");
+      var total = PR.questions.length;
+      var totalPages = Math.max(1, Math.ceil(total / PR.perPage));
+      if(PR.page > totalPages) PR.page = totalPages;
+      var start = (PR.page - 1) * PR.perPage;
+      var s = prScore();
+
+      var html = '<div class="score-strip">'
+        + '<div class="chip">Attempted<b>' + s.a + '</b></div>'
+        + '<div class="chip">Correct<b>' + s.c + '</b></div>'
+        + '<div class="chip">Total MCQs<b>' + total.toLocaleString() + '</b></div>'
+        + '</div>';
+
+      for(var i = 0; i < PR.perPage && start + i < total; i++){
+        var qi = start + i, m = PR.questions[qi];
+        html += '<div class="q-card" data-qi="' + qi + '">'
+          + '<div class="q-top"><span>Question ' + (qi + 1) + '</span><span>' + esc(PR.slug) + '</span></div>'
+          + '<div class="q-text">' + esc(m.question) + '</div><div class="opts">';
+        PR.qopts[qi].forEach(function(o){
+          html += '<button class="opt" data-k="' + o.k + '">' + esc(o.t) + '<span class="tick"></span></button>';
+        });
+        html += '</div><div class="explain"></div></div>';
+      }
+
+      html += '<div class="pager">';
+      html += '<button class="pg-btn" data-pg="' + (PR.page - 1) + '"' + (PR.page === 1 ? ' disabled' : '') + '>‹</button>';
+      pageNums(PR.page, totalPages).forEach(function(n){
+        if(n === "…") html += '<span class="pg-dots">…</span>';
+        else html += '<button class="pg-btn' + (n === PR.page ? ' active' : '') + '" data-pg="' + n + '">' + n + '</button>';
+      });
+      html += '<button class="pg-btn" data-pg="' + (PR.page + 1) + '"' + (PR.page === totalPages ? ' disabled' : '') + '>›</button>';
+      html += '</div>';
+      html += '<div class="pg-goto"><input type="number" id="pgInput" min="1" max="' + totalPages + '" placeholder="Go to page">'
+        + '<button class="btn btn-primary" id="pgGo">Go</button></div>';
+
+      box.innerHTML = html;
+
+      box.querySelectorAll(".q-card").forEach(function(card){
+        var qi = parseInt(card.getAttribute("data-qi"), 10);
+        if(PR.answers[qi]){ lockPracticeCard(card, qi); return; }
+        card.querySelectorAll(".opt").forEach(function(b){
+          b.addEventListener("click", function(){
+            PR.answers[qi] = b.getAttribute("data-k");
+            lockPracticeCard(card, qi);
+            var sc = prScore();
+            var chips = box.querySelectorAll(".score-strip .chip b");
+            chips[0].textContent = sc.a; chips[1].textContent = sc.c;
+          });
+        });
+      });
+
+      box.querySelectorAll(".pg-btn").forEach(function(b){
+        if(b.disabled) return;
+        b.addEventListener("click", function(){
+          var p = parseInt(b.getAttribute("data-pg"), 10);
+          if(p >= 1 && p <= totalPages && p !== PR.page){
+            PR.page = p; renderPractice(); window.scrollTo(0, 0);
+          }
+        });
+      });
+      el("pgGo").addEventListener("click", function(){
+        var v = parseInt(el("pgInput").value, 10);
+        if(v >= 1 && v <= totalPages && v !== PR.page){
+          PR.page = v; renderPractice(); window.scrollTo(0, 0);
+        }
+      });
+    }
+
+    (function initPracticeSelect(){
+      var sel = el("practiceSubject");
+      SUBJECTS.forEach(function(s){
+        var o = document.createElement("option");
+        o.value = s.slug; o.textContent = s.name;
+        sel.appendChild(o);
+      });
+      sel.addEventListener("change", function(){ PR.slug = sel.value; startPractice(); });
+    })();
+
+    /* ---------- PPSC Exam Simulator ---------- */
+    var SIM = {q:100, min:90, neg:0.25, pass:40};
+    var EX = { questions:[], qopts:[], answers:[], idx:0, timeLeft:0, timerId:null, running:false };
+
+    function renderSimSetup(){
+      var box = el("simBox");
+      box.innerHTML = '<div class="result-card">'
+        + '<span class="badge live">PPSC Practice Simulator</span>'
+        + '<h2 style="margin:16px 0 8px">Simulator Settings</h2>'
+        + '<div class="sim-meta"><div><b>' + SIM.q + '</b>MCQs</div><div><b>' + SIM.min + '</b>Minutes</div>'
+        + '<div><b>−' + SIM.neg + '</b>Negative marking</div><div><b>' + SIM.pass + '%</b>Pass marks</div></div>'
+        + '<p style="color:var(--muted);max-width:480px;margin:0 auto 22px">' + SIM.q + ' random questions from the full PPSC bank. Wrong answers cost ' + SIM.neg + ' marks.</p>'
+        + '<button class="btn btn-amber" id="beginSim" style="width:100%">Start Exam</button></div>';
+      el("beginSim").addEventListener("click", startSim);
+    }
+
+    function startSim(){
+      if(!dataReady || !ALL_MCQS.length) return;
+      EX.questions = shuffle(ALL_MCQS).slice(0, Math.min(SIM.q, ALL_MCQS.length));
+      EX.qopts = EX.questions.map(toOptions);
+      EX.answers = new Array(EX.questions.length).fill(null);
+      EX.idx = 0; EX.timeLeft = SIM.min * 60; EX.running = true;
+      renderSimQ();
+    }
+
+    function fmt(s){
+      var m = Math.floor(s / 60), ss = s % 60;
+      return (m < 10 ? "0" : "") + m + ":" + (ss < 10 ? "0" : "") + ss;
+    }
+
+    function renderSimQ(){
+      var box = el("simBox");
+      var total = EX.questions.length, m = EX.questions[EX.idx];
+      var html = '<div class="progress"><i style="width:' + Math.round(EX.idx / total * 100) + '%"></i></div>';
+      html += '<div class="q-card"><div class="q-top"><span>Question ' + (EX.idx + 1) + ' of ' + total + '</span>'
+        + '<span class="q-timer" id="simTimer">' + fmt(EX.timeLeft) + '</span></div>';
+      html += '<div class="q-text">' + esc(m.question) + '</div><div class="opts">';
+      EX.qopts[EX.idx].forEach(function(o){
+        var sel = EX.answers[EX.idx] === o.k ? ' style="border-color:var(--primary);background:var(--primary-soft)"' : '';
+        html += '<button class="opt" data-k="' + o.k + '"' + sel + '>' + esc(o.t) + '<span class="tick"></span></button>';
+      });
+      html += '</div><div class="q-nav"><button class="btn btn-outline" id="simPrev"' + (EX.idx === 0 ? ' disabled style="opacity:.4"' : '') + '>← Back</button>';
+      if(EX.idx < total - 1) html += '<button class="btn btn-primary" id="simNext">Next →</button>';
+      else html += '<button class="btn btn-amber" id="simFinish">Finish Exam</button>';
+      html += '</div></div>';
+      box.innerHTML = html;
+      startSimTimer();
+      box.querySelectorAll(".opt").forEach(function(b){
+        b.addEventListener("click", function(){
+          EX.answers[EX.idx] = b.getAttribute("data-k");
+          box.querySelectorAll(".opt").forEach(function(x){
+            x.style.borderColor = ""; x.style.background = "";
+          });
+          b.style.borderColor = "var(--primary)"; b.style.background = "var(--primary-soft)";
+        });
+      });
+      var pq = el("simPrev");
+      if(pq && EX.idx > 0) pq.addEventListener("click", function(){ EX.idx--; renderSimQ(); });
+      var nq = el("simNext");
+      if(nq) nq.addEventListener("click", function(){ EX.idx++; renderSimQ(); window.scrollTo(0,0); });
+      var fe = el("simFinish");
+      if(fe) fe.addEventListener("click", finishSim);
+    }
+
+    function startSimTimer(){
+      if(EX.timerId) return;
+      EX.timerId = setInterval(function(){
+        EX.timeLeft--;
+        var t = el("simTimer");
+        if(t){
+          t.textContent = fmt(Math.max(0, EX.timeLeft));
+          if(EX.timeLeft < 300) t.classList.add("warn");
+        }
+        if(EX.timeLeft <= 0){ clearInterval(EX.timerId); EX.timerId = null; finishSim(); }
+      }, 1000);
+    }
+
+    function finishSim(){
+      if(EX.timerId){ clearInterval(EX.timerId); EX.timerId = null; }
+      EX.running = false;
+      var box = el("simBox");
+      var total = EX.questions.length, correct = 0, wrong = 0, skipped = 0, i;
+      var review = [];
+      EX.questions.forEach(function(m, idx){
+        var a = EX.answers[idx];
+        if(a === null) skipped++;
+        else if(a === m.correct_option) correct++;
+        else wrong++;
+        review.push({m:m, a:a});
+      });
+      var score = correct - wrong * SIM.neg;
+      var pct = Math.round(score / total * 100);
+      var pass = pct >= SIM.pass;
+      var html = '<div class="result-card"><span class="badge ' + (pass ? "live" : "soon") + '">'
+        + (pass ? "PASSED ✓" : "NOT QUALIFIED") + '</span>'
+        + '<div class="result-score">' + score.toFixed(2) + ' / ' + total + '</div>'
+        + '<div class="result-meta"><div><b>' + correct + '</b>Correct</div><div><b>' + wrong + '</b>Wrong (−' + SIM.neg + ')</div>'
+        + '<div><b>' + skipped + '</b>Skipped</div><div><b>' + pct + '%</b>Score</div></div>'
+        + '<h3 style="text-align:left;margin:20px 0 6px">Answer Review</h3><div class="review-list">';
+      review.forEach(function(r, idx){
+        var cls = r.a === null ? "soon" : (r.a === r.m.correct_option ? "live" : "soon");
+        var mark = r.a === null ? "Skipped"
+          : (r.a === r.m.correct_option ? "✓ Correct" : "✗ Wrong (you: " + r.a + ", answer: " + r.m.correct_option + ")");
+        html += '<div class="review-item"><b>' + (idx + 1) + '. ' + esc(r.m.question) + '</b>'
+          + '<span class="badge ' + cls + '">' + mark + '</span>'
+          + (r.m.explanation ? '<div style="margin-top:8px;color:var(--muted)">' + esc(r.m.explanation) + '</div>' : '')
+          + '</div>';
+      });
+      html += '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">'
+        + '<button class="btn btn-amber" id="retakeSim">Retake</button>'
+        + '<button class="btn btn-outline" id="simToPractice">Practice</button></div></div>';
+      box.innerHTML = html;
+      window.scrollTo(0, 0);
+      el("retakeSim").addEventListener("click", function(){ renderSimSetup(); });
+      el("simToPractice").addEventListener("click", function(){ showScreen("screen-practice"); });
+    }
+
+    /* ---------- Settings: expandable panels ---------- */
+    document.querySelectorAll(".set-row[data-panel]").forEach(function(row){
+      row.addEventListener("click", function(){
+        var p = el(row.getAttribute("data-panel"));
+        var wasOpen = p.classList.contains("open");
+        document.querySelectorAll(".set-panel").forEach(function(x){ x.classList.remove("open"); });
+        if(!wasOpen) p.classList.add("open");
+      });
+    });
+
+    /* ---------- Settings: CSV file upload ---------- */
+    (function initFileUpload(){
+      var sel = el("file_subject");
+      SUBJECTS.forEach(function(s){
+        var o = document.createElement("option");
+        o.value = s.slug; o.textContent = s.name;
+        sel.appendChild(o);
+      });
+      var input = el("fileInput"), zone = el("dropZone"), dzFile = el("dzFile"),
+          btn = el("fileUploadBtn"), msg = el("fileMsg"),
+          prog = el("fileProg"), progBar = el("fileProgBar");
+      var file = null;
+      function fmsg(t, ok){ msg.className = "form-msg " + (ok ? "ok" : "err"); msg.textContent = t; }
+      function setFile(f){
+        file = f;
+        dzFile.textContent = f ? ("📎 " + f.name) : "";
+        btn.disabled = !f;
+        msg.className = "form-msg"; msg.textContent = "";
+      }
+      zone.addEventListener("click", function(){ input.click(); });
+      input.addEventListener("change", function(){ if(input.files.length) setFile(input.files[0]); });
+      function parseCSV(text){
+        var rows = [], row = [], cur = "", q = false, i = 0;
+        while(i < text.length){
+          var c = text[i];
+          if(q){
+            if(c === '"'){ if(text[i+1] === '"'){ cur += '"'; i += 2; } else { q = false; i++; } }
+            else { cur += c; i++; }
+          } else if(c === '"'){ q = true; i++; }
+          else if(c === ","){ row.push(cur); cur = ""; i++; }
+          else if(c === "\n"){ row.push(cur); rows.push(row); row = []; cur = ""; i++; }
+          else if(c === "\r"){ i++; }
+          else { cur += c; i++; }
+        }
+        row.push(cur); rows.push(row);
+        return rows.filter(function(r){ return r.some(function(x){ return x.trim() !== ""; }); });
+      }
+      function norm(s){ return (s || "").trim().toLowerCase().replace(/\s+/g, " "); }
+      function keyOf(r){ return norm(r.question)+"|"+norm(r.option_a)+"|"+norm(r.option_b)+"|"+norm(r.option_c)+"|"+norm(r.option_d); }
+      btn.addEventListener("click", function(){
+        if(!file) return;
+        var slug = sel.value;
+        if(!slug){ fmsg("Please choose a subject first.", false); return; }
+        btn.disabled = true; btn.textContent = "Reading file…";
+        var reader = new FileReader();
+        reader.onload = function(){
+          var rows;
+          try { rows = parseCSV(String(reader.result)); }
+          catch(e){ btn.disabled = false; btn.textContent = "Upload File"; fmsg("Could not read this CSV file.", false); return; }
+          if(rows.length && /^question$/i.test(rows[0][0].trim())) rows.shift();
+          var seen = {}, fresh = [], skipped = 0;
+          rows.forEach(function(r){
+            var m = {
+              question:(r[0]||"").trim(), option_a:(r[1]||"").trim(), option_b:(r[2]||"").trim(),
+              option_c:(r[3]||"").trim(), option_d:(r[4]||"").trim(),
+              correct_option:(r[5]||"").trim().toUpperCase(), explanation:(r[6]||"").trim(),
+              subject_slug:slug, exam_body:"ppsc", is_active:true
+            };
+            if(!m.question || !m.option_a || !m.option_b || !m.option_c || !m.option_d){ skipped++; return; }
+            if(!/^[ABCD]$/.test(m.correct_option)){ skipped++; return; }
+            var k = keyOf(m);
+            if(seen[k]){ skipped++; return; }
+            seen[k] = 1; fresh.push(m);
+          });
+          if(!fresh.length){
+            btn.disabled = false; btn.textContent = "Upload File";
+            fmsg("No valid MCQs found (" + skipped + " rows skipped). Check the CSV format.", false);
+            return;
+          }
+          btn.textContent = "Checking duplicates…";
+          var existing = {}, start = 0, size = 1000;
+          (function loadEx(done){
+            sb.from("mcqs").select("question,option_a,option_b,option_c,option_d")
+              .eq("subject_slug", slug).range(start, start + size - 1)
+              .then(function(res){
+                (res.data || []).forEach(function(x){ existing[keyOf(x)] = 1; });
+                if((res.data || []).length === size){ start += size; loadEx(done); }
+                else done();
+              }).catch(function(){ done(); });
+          })(function(){
+            var toInsert = fresh.filter(function(m){ return !existing[keyOf(m)]; });
+            var dupes = fresh.length - toInsert.length;
+            if(!toInsert.length){
+              btn.disabled = false; btn.textContent = "Upload File";
+              fmsg("All " + fresh.length + " MCQs are already in the database — nothing new to add.", true);
+              return;
+            }
+            prog.hidden = false; progBar.style.width = "0%";
+            var doneN = 0, batch = 200, failed = 0;
+            (function sendBatch(){
+              var slice = toInsert.slice(doneN, doneN + batch);
+              sb.from("mcqs").insert(slice).then(function(res){
+                if(res.error) failed += slice.length;
+                doneN += slice.length;
+                progBar.style.width = Math.round(doneN / toInsert.length * 100) + "%";
+                if(doneN < toInsert.length) sendBatch(); else finish();
+              }).catch(function(){
+                failed += slice.length; doneN += slice.length;
+                progBar.style.width = Math.round(doneN / toInsert.length * 100) + "%";
+                if(doneN < toInsert.length) sendBatch(); else finish();
+              });
+            })();
+            function finish(){
+              btn.disabled = false; btn.textContent = "Upload File";
+              prog.hidden = true; setFile(null); input.value = "";
+              var added = toInsert.length - failed, parts = [added + " MCQs added"];
+              if(dupes) parts.push(dupes + " duplicates skipped");
+              if(skipped) parts.push(skipped + " invalid rows skipped");
+              if(failed) parts.push(failed + " failed");
+              fmsg("Done: " + parts.join(" · ") + ".", failed === 0);
+              if(added > 0){ dataReady = false; fetchAllMCQs().then(function(all){ ALL_MCQS = all; onDataReady(); }).catch(function(){}); }
+            }
+          });
+        };
+        reader.onerror = function(){
+          btn.disabled = false; btn.textContent = "Upload File";
+          fmsg("Could not read this file.", false);
+        };
+        reader.readAsText(file);
+      });
+    })();
+
+    /* ---------- Upload MCQ ---------- */
+    (function initUpload(){
+      var sel = el("f_subject");
+      SUBJECTS.forEach(function(s){
+        var o = document.createElement("option");
+        o.value = s.slug; o.textContent = s.name;
+        sel.appendChild(o);
+      });
+      var form = el("uploadForm"), msg = el("formMsg");
+      function say(text, ok){
+        msg.className = "form-msg " + (ok ? "ok" : "err");
+        msg.textContent = text;
+        window.scrollTo(0, 0);
+      }
+      form.addEventListener("submit", function(ev){
+        ev.preventDefault();
+        var data = {
+          question: el("f_question").value.trim(),
+          option_a: el("f_a").value.trim(),
+          option_b: el("f_b").value.trim(),
+          option_c: el("f_c").value.trim(),
+          option_d: el("f_d").value.trim(),
+          correct_option: (form.querySelector('input[name="correct"]:checked') || {}).value || null,
+          explanation: el("f_explain").value.trim(),
+          subject_slug: sel.value,
+          submitter_name: el("f_name").value.trim(),
+          status: "pending"
+        };
+        if(!data.question){ say("Please write the question.", false); return; }
+        if(!data.option_a || !data.option_b || !data.option_c || !data.option_d){ say("Please fill all four options (A–D).", false); return; }
+        if(!data.correct_option){ say("Please mark the correct answer (A, B, C or D).", false); return; }
+        if(!data.subject_slug){ say("Please choose a subject.", false); return; }
+        var btn = el("submitBtn");
+        btn.disabled = true; btn.textContent = "Submitting…";
+        sb.from("mcq_submissions").insert([data]).then(function(res){
+          btn.disabled = false; btn.textContent = "Submit MCQ";
+          if(res.error){ say("Could not submit right now. Please try again later.", false); return; }
+          form.reset();
+          say("Thank you! Your MCQ was received and is under review. It will appear in the app after approval.", true);
+        }).catch(function(){
+          btn.disabled = false; btn.textContent = "Submit MCQ";
+          say("Could not submit right now. Please try again later.", false);
+        });
+      });
+    })();
+
+    /* ---------- Boot: load the full bank, then render ---------- */
+    function onDataReady(){
+      dataReady = true;
+      renderHome();
+      renderSubjects();
+      if(el("screen-practice").classList.contains("active")) startPractice();
+      renderSimSetup();
+    }
+    function onDataError(){
+      dataError = true;
+      el("homeSubjectList").innerHTML = '<div class="loading-card">Could not load the question bank. Check your connection and reopen the app.</div>';
+      el("subjectList").innerHTML = '<div class="loading-card">Could not load the question bank.</div>';
+      el("totalCountLabel").textContent = "Offline";
+      el("practiceBox").innerHTML = '<div class="loading-card">Could not load the question bank.</div>';
+      el("simBox").innerHTML = '<div class="loading-card">Could not load the question bank.</div>';
+    }
+    el("homePracticeBtn").addEventListener("click", function(){ showScreen("screen-subjects"); });
+    el("homeSimBtn").addEventListener("click", function(){ showScreen("screen-sim"); });
+    el("homeViewAll").addEventListener("click", function(){ showScreen("screen-subjects"); });
+    renderHome();
+    renderSubjects();
+    renderSimSetup();
+    fetchAllMCQs().then(function(all){
+      ALL_MCQS = all;
+      onDataReady();
+    }).catch(onDataError);
+
+  })();
+  </script>
+</body>
+</html>
