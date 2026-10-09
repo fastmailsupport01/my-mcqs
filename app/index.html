@@ -191,8 +191,9 @@
     .page-block p, .page-block li { color: var(--muted); font-size: .92rem; }
     .page-block ul { padding-left: 20px; }
     .page-block li { margin-bottom: 8px; }
-    .credit-line { text-align: center; color: var(--muted); font-size: .78rem; margin: 26px 0 6px; }
+    .credit-line { text-align: center; color: var(--muted); font-size: .78rem; margin: 26px 0 6px; display:flex; align-items:center; justify-content:center; gap:8px; }
     .credit-line .credit { font-weight: 800; color: var(--ink); }
+    .credit-line .dev-logo { width:34px; height:34px; border-radius:50%; object-fit:cover; background:#fff; }
 
     /* Bottom tab bar — bank-APK style: floating, centred, Settings on the right */
     .tabbar{
@@ -419,7 +420,7 @@
         </div>
       </div>
 
-      <p class="credit-line">Developer: <span class="credit">cos</span> - +923264025618</p>
+      <p class="credit-line"><img src="cos-logo.jpg" alt="COS logo" class="dev-logo">Developer: <span class="credit">cos</span> - +923264025618</p>
     </section>
   </main>
 
