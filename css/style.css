@@ -175,6 +175,8 @@ footer{border-top:1px solid var(--line);background:var(--surface);margin-top:20p
 .foot nav a{color:var(--muted);font-weight:600}
 .foot nav a:hover{color:var(--primary)}
 .credit{font-weight:800;color:var(--ink)}
+.dev-credit{display:inline-flex;align-items:center;gap:8px}
+.dev-logo{width:34px;height:34px;border-radius:50%;object-fit:cover;flex:0 0 auto;background:#fff}
 
 @media(max-width:640px){
   .nav a{padding:8px 9px;font-size:.82rem}
