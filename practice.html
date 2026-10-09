@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice | My MCQs — PPSC Test Preparation</title>
+<meta name="description" content="Practice PPSC MCQs subject-wise with instant answers and explanations on My MCQs.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap bar">
+  <a class="brand" href="index.html"><span class="mark">✓</span><span class="btx">My MCQs<small>PPSC TEST PREPARATION</small></span></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="subjects.html" class="active">Subjects</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="about.html">About</a>
+    <a href="settings.html" class="gear" title="Settings">⚙️</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <p class="eyebrow">Practice Mode</p>
+  <h1 class="hero" id="pTitle">Practice</h1>
+  <p class="sub">Attempt each question — the answer and explanation reveal after you choose.</p>
+  <div class="quiz-top">
+    <select class="subject-pick" id="pSubject" aria-label="Choose subject"></select>
+  </div>
+  <div id="pBox"><div class="empty">Loading questions…</div></div>
+</main>
+
+<footer><div class="wrap foot">
+  <span>© 2026 My MCQs · Free PPSC preparation</span>
+  <nav><a href="subjects.html">Subjects</a><a href="simulator.html">Simulator</a><a href="settings.html">Settings</a><a href="about.html">About</a></nav>
+  <span>Developer: <span class="credit">cos</span> - +923264025618</span>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  var sel = App.el("pSubject"), box = App.el("pBox");
+  var qs = new URLSearchParams(location.search).get("subject") || "";
+  App.SUBJECTS.forEach(function(s){
+    var o = document.createElement("option");
+    o.value = s.slug; o.textContent = s.name;
+    if(s.slug === qs) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change", function(){ load(sel.value); });
+
+  function meta(slug){ return App.SUBJECTS.find(function(s){ return s.slug === slug; }); }
+  function load(slug){
+    var m = meta(slug);
+    App.el("pTitle").textContent = (m ? m.name : "Practice") + " — Practice";
+    box.innerHTML = '<div class="empty">Loading questions…</div>';
+    App.fetchAll(slug, function(data){
+      if(!data.length){
+        box.innerHTML = '<div class="empty"><h3>MCQs coming soon</h3><p>Questions for this subject are being added.</p></div>';
+        return;
+      }
+      run(App.shuffle(data));
+    });
+  }
+  function run(questions){
+    var perPage = 20, page = 1, answers = {};
+    var totalPages = Math.max(1, Math.ceil(questions.length / perPage));
+    var qopts = questions.map(App.toOptions);
+    function score(){
+      var a = 0, c = 0;
+      questions.forEach(function(m, i){ if(answers[i]){ a++; if(answers[i] === m.correct_option) c++; } });
+      return {a:a, c:c};
+    }
+    function pageNums(cur, total){
+      var out = [];
+      if(total <= 9){ for(var i = 1; i <= total; i++) out.push(i); }
+      else if(cur <= 5){ for(var i = 1; i <= 6; i++) out.push(i); out.push("…"); out.push(total); }
+      else if(cur >= total - 4){ out.push(1); out.push("…"); for(var i = total - 5; i <= total; i++) out.push(i); }
+      else { out.push(1); out.push("…"); for(var i = cur - 2; i <= cur + 2; i++) out.push(i); out.push("…"); out.push(total); }
+      return out;
+    }
+    function render(){
+      var s = score(), start = (page - 1) * perPage;
+      var html = '<div class="score-strip"><div class="chip">Attempted<b>' + s.a + '</b></div>'
+        + '<div class="chip">Correct<b>' + s.c + '</b></div>'
+        + '<div class="chip">Total MCQs<b>' + questions.length + '</b></div></div>';
+      questions.slice(start, start + perPage).forEach(function(m, k){
+        var qi = start + k, o = qopts[qi], picked = answers[qi];
+        html += '<div class="q-card" data-qi="' + qi + '"><div class="q-top"><span>Question ' + (qi + 1) + '</span></div>'
+          + '<p class="q-text">' + App.esc(m.question) + '</p><div class="opts">';
+        o.order.forEach(function(L){
+          var cls = "opt", tick = "";
+          if(picked){
+            if(L === m.correct_option){ cls += " correct"; tick = "✓"; }
+            else if(L === picked){ cls += " wrong"; tick = "✗"; }
+          }
+          html += '<button class="' + cls + '" data-k="' + L + '"' + (picked ? " disabled" : "")
+            + '><span><b>' + L + '.</b> ' + App.esc(o.texts[L]) + '</span><span class="tick">' + tick + '</span></button>';
+        });
+        html += '</div><div class="explain' + (picked ? " show" : "") + '">'
+          + (picked ? "<strong>Explanation:</strong> " + App.esc(m.explanation || ("Correct answer is option " + m.correct_option + ".")) : "")
+          + '</div></div>';
+      });
+      html += '<div class="pager">';
+      pageNums(page, totalPages).forEach(function(p){
+        if(p === "…"){ html += '<span class="pg-btn" style="border:0;background:none;cursor:default">…</span>'; }
+        else html += '<button class="pg-btn' + (p === page ? " active" : "") + '" data-pg="' + p + '">' + p + '</button>';
+      });
+      html += '</div>';
+      box.innerHTML = html;
+      box.querySelectorAll(".opt").forEach(function(b){
+        b.addEventListener("click", function(){
+          var card = b.closest(".q-card"), qi = +card.getAttribute("data-qi");
+          if(answers[qi]) return;
+          answers[qi] = b.getAttribute("data-k");
+          render();
+        });
+      });
+      box.querySelectorAll("[data-pg]").forEach(function(b){
+        b.addEventListener("click", function(){ page = +b.getAttribute("data-pg"); render(); window.scrollTo({top:0, behavior:"smooth"}); });
+      });
+    }
+    render();
+  }
+  load(qs || App.SUBJECTS[0].slug);
+})();
+</script>
+</body>
+</html>

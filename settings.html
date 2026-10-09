@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings | My MCQs — Upload MCQs</title>
+<meta name="description" content="My MCQs settings — submit a single MCQ or bulk-upload a CSV file of PPSC questions.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap bar">
+  <a class="brand" href="index.html"><span class="mark">✓</span><span class="btx">My MCQs<small>PPSC TEST PREPARATION</small></span></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="about.html">About</a>
+    <a href="settings.html" class="gear active" title="Settings">⚙️</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <p class="eyebrow">Settings</p>
+  <h1 class="hero">Contribute MCQs</h1>
+  <p class="sub">Share PPSC questions with thousands of aspirants.</p>
+
+  <div class="set-grid">
+    <div class="form-card">
+      <h2>📝 Upload MCQ</h2>
+      <p>Submit one question. Every submission is <b>reviewed before going live</b>.</p>
+      <div class="form-msg" id="formMsg"></div>
+      <form id="uploadForm" novalidate>
+        <div class="field">
+          <label for="f_name">Your name <small>(optional)</small></label>
+          <input type="text" id="f_name" maxlength="80" placeholder="e.g. Ali Raza">
+        </div>
+        <div class="field">
+          <label for="f_subject">Subject *</label>
+          <select id="f_subject"><option value="">— Choose subject —</option></select>
+        </div>
+        <div class="field">
+          <label for="f_question">Question *</label>
+          <textarea id="f_question" maxlength="2000" placeholder="Type the MCQ question here…"></textarea>
+        </div>
+        <div class="opt-row">
+          <div class="field"><label for="f_a">Option A *</label><input type="text" id="f_a" maxlength="500"></div>
+          <div class="field"><label for="f_b">Option B *</label><input type="text" id="f_b" maxlength="500"></div>
+          <div class="field"><label for="f_c">Option C *</label><input type="text" id="f_c" maxlength="500"></div>
+          <div class="field"><label for="f_d">Option D *</label><input type="text" id="f_d" maxlength="500"></div>
+        </div>
+        <div class="field">
+          <label>Correct answer *</label>
+          <div class="radio-row">
+            <label class="radio-pill"><input type="radio" name="correct" value="A"> A</label>
+            <label class="radio-pill"><input type="radio" name="correct" value="B"> B</label>
+            <label class="radio-pill"><input type="radio" name="correct" value="C"> C</label>
+            <label class="radio-pill"><input type="radio" name="correct" value="D"> D</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f_explain">Explanation <small>(optional)</small></label>
+          <textarea id="f_explain" maxlength="2000" placeholder="Why is this the correct answer?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-amber btn-wide" id="submitBtn">Submit MCQ</button>
+      </form>
+    </div>
+
+    <div class="form-card">
+      <h2>📄 Upload File</h2>
+      <p>Bulk-upload MCQs from a <b>CSV file</b>. Duplicates are skipped automatically.</p>
+      <div class="field">
+        <label for="file_subject">Subject *</label>
+        <select id="file_subject"><option value="">— Choose subject —</option></select>
+      </div>
+      <label class="dropzone" id="dropZone">
+        <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+        <span class="dz-icon">📄</span>
+        <span class="dz-text"><strong>Choose a CSV file</strong> or drag it here</span>
+        <span class="dz-file" id="dzFile"></span>
+      </label>
+      <details class="csv-help">
+        <summary>CSV format</summary>
+        <p>First row is a header (or omit it). Columns in order:</p>
+        <code>question, option_a, option_b, option_c, option_d, correct_option, explanation</code>
+        <p class="fine">correct_option must be A, B, C or D. Keep commas inside quotes: <code>"Which one, A or B?","x","y","z","w","A",""</code></p>
+      </details>
+      <button class="btn btn-primary btn-wide" id="fileUploadBtn" disabled>Upload File</button>
+      <div class="progress" id="fileProg" hidden style="margin-top:14px"><i id="fileProgBar" style="width:0"></i></div>
+      <div class="form-msg" id="fileMsg" style="margin-top:14px"></div>
+    </div>
+  </div>
+</main>
+
+<footer><div class="wrap foot">
+  <span>© 2026 My MCQs · Free PPSC preparation</span>
+  <nav><a href="subjects.html">Subjects</a><a href="simulator.html">Simulator</a><a href="settings.html">Settings</a><a href="about.html">About</a></nav>
+  <span>Developer: <span class="credit">cos</span> - +923264025618</span>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  ["f_subject","file_subject"].forEach(function(id){
+    var sel = App.el(id);
+    App.SUBJECTS.forEach(function(s){
+      var o = document.createElement("option");
+      o.value = s.slug; o.textContent = s.name;
+      sel.appendChild(o);
+    });
+  });
+
+  /* ----- single MCQ ----- */
+  (function(){
+    var form = App.el("uploadForm"), msg = App.el("formMsg");
+    function say(t, ok){ msg.className = "form-msg " + (ok ? "ok" : "err"); msg.textContent = t; }
+    form.addEventListener("submit", function(ev){
+      ev.preventDefault();
+      if(!App.isConfigured()){ say("Submission service is not configured yet. Please try again later.", false); return; }
+      var data = {
+        question: App.el("f_question").value.trim(),
+        option_a: App.el("f_a").value.trim(), option_b: App.el("f_b").value.trim(),
+        option_c: App.el("f_c").value.trim(), option_d: App.el("f_d").value.trim(),
+        correct_option: (form.querySelector('input[name="correct"]:checked') || {}).value || null,
+        explanation: App.el("f_explain").value.trim(),
+        subject_slug: App.el("f_subject").value,
+        submitter_name: App.el("f_name").value.trim(),
+        status: "pending"
+      };
+      if(!data.question){ say("Please write the question.", false); return; }
+      if(!data.option_a || !data.option_b || !data.option_c || !data.option_d){ say("Please fill all four options (A–D).", false); return; }
+      if(!data.correct_option){ say("Please mark the correct answer (A, B, C or D).", false); return; }
+      if(!data.subject_slug){ say("Please choose a subject.", false); return; }
+      var b = App.el("submitBtn");
+      b.disabled = true; b.textContent = "Submitting…";
+      App.supabase().from("mcq_submissions").insert([data]).then(function(res){
+        b.disabled = false; b.textContent = "Submit MCQ";
+        if(res.error){ say("Could not submit right now. Please try again later.", false); return; }
+        form.reset();
+        say("Thank you! Your MCQ was received and is under review. It will appear on the site after approval.", true);
+      }).catch(function(){
+        b.disabled = false; b.textContent = "Submit MCQ";
+        say("Could not submit right now. Please try again later.", false);
+      });
+    });
+  })();
+
+  /* ----- CSV file upload ----- */
+  (function(){
+    var input = App.el("fileInput"), zone = App.el("dropZone"), dzFile = App.el("dzFile"),
+        btn = App.el("fileUploadBtn"), msg = App.el("fileMsg"),
+        prog = App.el("fileProg"), progBar = App.el("fileProgBar"), subjSel = App.el("file_subject");
+    var file = null;
+    function fmsg(t, ok){ msg.className = "form-msg " + (ok ? "ok" : "err"); msg.textContent = t; }
+    function setFile(f){
+      file = f;
+      dzFile.textContent = f ? ("📎 " + f.name) : "";
+      btn.disabled = !f;
+      msg.className = "form-msg"; msg.textContent = "";
+    }
+    zone.addEventListener("dragover", function(e){ e.preventDefault(); zone.classList.add("drag"); });
+    zone.addEventListener("dragleave", function(){ zone.classList.remove("drag"); });
+    zone.addEventListener("drop", function(e){
+      e.preventDefault(); zone.classList.remove("drag");
+      if(e.dataTransfer.files.length) setFile(e.dataTransfer.files[0]);
+    });
+    input.addEventListener("change", function(){ if(input.files.length) setFile(input.files[0]); });
+
+    function parseCSV(text){
+      var rows = [], row = [], cur = "", q = false, i = 0;
+      while(i < text.length){
+        var c = text[i];
+        if(q){
+          if(c === '"'){ if(text[i+1] === '"'){ cur += '"'; i += 2; } else { q = false; i++; } }
+          else { cur += c; i++; }
+        } else if(c === '"'){ q = true; i++; }
+        else if(c === ","){ row.push(cur); cur = ""; i++; }
+        else if(c === "\n"){ row.push(cur); rows.push(row); row = []; cur = ""; i++; }
+        else if(c === "\r"){ i++; }
+        else { cur += c; i++; }
+      }
+      row.push(cur); rows.push(row);
+      return rows.filter(function(r){ return r.some(function(x){ return x.trim() !== ""; }); });
+    }
+    function norm(s){ return (s || "").trim().toLowerCase().replace(/\s+/g, " "); }
+    function keyOf(r){ return norm(r.question)+"|"+norm(r.option_a)+"|"+norm(r.option_b)+"|"+norm(r.option_c)+"|"+norm(r.option_d); }
+
+    btn.addEventListener("click", function(){
+      if(!file) return;
+      var slug = subjSel.value;
+      if(!slug){ fmsg("Please choose a subject first.", false); return; }
+      if(!App.isConfigured()){ fmsg("Upload service is not configured yet. Please try again later.", false); return; }
+      btn.disabled = true; btn.textContent = "Reading file…";
+      var reader = new FileReader();
+      reader.onload = function(){
+        var rows;
+        try { rows = parseCSV(String(reader.result)); }
+        catch(e){ btn.disabled = false; btn.textContent = "Upload File"; fmsg("Could not read this CSV file.", false); return; }
+        if(rows.length && /^question$/i.test(rows[0][0].trim())) rows.shift();
+        var seen = {}, fresh = [], skipped = 0;
+        rows.forEach(function(r){
+          var m = {
+            question:(r[0]||"").trim(), option_a:(r[1]||"").trim(), option_b:(r[2]||"").trim(),
+            option_c:(r[3]||"").trim(), option_d:(r[4]||"").trim(),
+            correct_option:(r[5]||"").trim().toUpperCase(), explanation:(r[6]||"").trim(),
+            subject_slug:slug, exam_body:"ppsc", is_active:true
+          };
+          if(!m.question || !m.option_a || !m.option_b || !m.option_c || !m.option_d){ skipped++; return; }
+          if(!/^[ABCD]$/.test(m.correct_option)){ skipped++; return; }
+          var k = keyOf(m);
+          if(seen[k]){ skipped++; return; }
+          seen[k] = 1; fresh.push(m);
+        });
+        if(!fresh.length){
+          btn.disabled = false; btn.textContent = "Upload File";
+          fmsg("No valid MCQs found (" + skipped + " rows skipped). Check the CSV format.", false);
+          return;
+        }
+        btn.textContent = "Checking duplicates…";
+        var existing = {}, start = 0, size = 1000;
+        (function loadEx(done){
+          App.supabase().from("mcqs").select("question,option_a,option_b,option_c,option_d")
+            .eq("subject_slug", slug).range(start, start + size - 1)
+            .then(function(res){
+              (res.data || []).forEach(function(x){ existing[keyOf(x)] = 1; });
+              if((res.data || []).length === size){ start += size; loadEx(done); }
+              else done();
+            }).catch(function(){ done(); });
+        })(function(){
+          var toInsert = fresh.filter(function(m){ return !existing[keyOf(m)]; });
+          var dupes = fresh.length - toInsert.length;
+          if(!toInsert.length){
+            btn.disabled = false; btn.textContent = "Upload File";
+            fmsg("All " + fresh.length + " MCQs are already in the database — nothing new to add.", true);
+            return;
+          }
+          prog.hidden = false; progBar.style.width = "0%";
+          var doneN = 0, batch = 200, failed = 0;
+          (function sendBatch(){
+            var slice = toInsert.slice(doneN, doneN + batch);
+            App.supabase().from("mcqs").insert(slice).then(function(res){
+              if(res.error) failed += slice.length;
+              doneN += slice.length;
+              progBar.style.width = Math.round(doneN / toInsert.length * 100) + "%";
+              if(doneN < toInsert.length) sendBatch(); else finish();
+            }).catch(function(){
+              failed += slice.length; doneN += slice.length;
+              progBar.style.width = Math.round(doneN / toInsert.length * 100) + "%";
+              if(doneN < toInsert.length) sendBatch(); else finish();
+            });
+          })();
+          function finish(){
+            btn.disabled = false; btn.textContent = "Upload File";
+            prog.hidden = true; setFile(null); input.value = "";
+            var added = toInsert.length - failed, parts = [added + " MCQs added"];
+            if(dupes) parts.push(dupes + " duplicates skipped");
+            if(skipped) parts.push(skipped + " invalid rows skipped");
+            if(failed) parts.push(failed + " failed");
+            fmsg("Done: " + parts.join(" · ") + ".", failed === 0);
+          }
+        });
+      };
+      reader.onerror = function(){
+        btn.disabled = false; btn.textContent = "Upload File";
+        fmsg("Could not read this file.", false);
+      };
+      reader.readAsText(file);
+    });
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPSC Simulator | My MCQs — One-Paper Mock Exam</title>
+<meta name="description" content="Free PPSC one-paper mock exam simulator: 100 MCQs, 90 minutes, negative marking — just like the real PPSC exam.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap bar">
+  <a class="brand" href="index.html"><span class="mark">✓</span><span class="btx">My MCQs<small>PPSC TEST PREPARATION</small></span></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="subjects.html">Subjects</a>
+    <a href="simulator.html" class="active">Simulator</a>
+    <a href="about.html">About</a>
+    <a href="settings.html" class="gear" title="Settings">⚙️</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <p class="eyebrow">PPSC Simulator</p>
+  <h1 class="hero">One-Paper Mock Exam</h1>
+  <p class="sub">100 random PPSC questions, 90 minutes, −0.25 per wrong answer — just like the real exam.</p>
+  <div id="simBox"><div class="empty">Loading question bank…</div></div>
+</main>
+
+<footer><div class="wrap foot">
+  <span>© 2026 My MCQs · Free PPSC preparation</span>
+  <nav><a href="subjects.html">Subjects</a><a href="simulator.html">Simulator</a><a href="settings.html">Settings</a><a href="about.html">About</a></nav>
+  <span>Developer: <span class="credit">cos</span> - +923264025618</span>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  var box = App.el("simBox");
+  var N = 100, MINS = 90, NEG = 0.25, PASS = 40;
+
+  function start(pool){
+    if(pool.length < 10){
+      box.innerHTML = '<div class="empty"><h3>Not enough questions yet</h3><p>The simulator needs more MCQs in the bank. Check back soon.</p></div>';
+      return;
+    }
+    box.innerHTML = '<div class="result-card"><h2 style="margin-top:0">Ready?</h2>'
+      + '<div class="sim-meta"><div>Questions<b>' + N + '</b></div><div>Time<b>' + MINS + ' min</b></div>'
+      + '<div>Negative<b>−' + NEG + '</b></div><div>To pass<b>' + PASS + '%</b></div></div>'
+      + '<button class="btn btn-amber" id="beginBtn">Start Exam</button></div>';
+    App.el("beginBtn").addEventListener("click", function(){ run(App.shuffle(pool).slice(0, N)); });
+  }
+
+  function run(questions){
+    var qopts = questions.map(App.toOptions);
+    var answers = {}, idx = 0, left = MINS * 60, timer = null, done = false;
+    function fmt(s){ var m = Math.floor(s/60), ss = s%60; return (m<10?"0":"")+m+":"+(ss<10?"0":"")+ss; }
+    function render(){
+      var q = questions[idx], o = qopts[idx];
+      var html = '<div class="quiz-top"><span class="q-timer' + (left < 300 ? " warn" : "") + '" id="simTimer">⏱ ' + fmt(left) + '</span>'
+        + '<span style="margin-left:auto;color:var(--muted);font-weight:700;font-size:.85rem">Q ' + (idx+1) + ' / ' + questions.length + '</span></div>'
+        + '<div class="progress"><i style="width:' + Math.round((idx+1)/questions.length*100) + '%"></i></div>'
+        + '<div class="q-card"><p class="q-text">' + App.esc(q.question) + '</p><div class="opts">';
+      o.order.forEach(function(L){
+        html += '<button class="opt' + (answers[idx] === L ? " correct" : "") + '" data-k="' + L + '">'
+          + '<span><b>' + L + '.</b> ' + App.esc(o.texts[L]) + '</span><span class="tick">' + (answers[idx] === L ? "✓" : "") + '</span></button>';
+      });
+      html += '</div></div><div class="q-nav">'
+        + '<button class="btn btn-outline" id="prevBtn"' + (idx === 0 ? " disabled" : "") + '>← Prev</button>'
+        + (idx === questions.length - 1
+            ? '<button class="btn btn-amber" id="finBtn">Finish Exam</button>'
+            : '<button class="btn btn-primary" id="nextBtn">Next →</button>')
+        + '</div>';
+      box.innerHTML = html;
+      box.querySelectorAll(".opt").forEach(function(b){
+        b.addEventListener("click", function(){ answers[idx] = b.getAttribute("data-k"); render(); });
+      });
+      var pv = App.el("prevBtn"); if(pv) pv.addEventListener("click", function(){ if(idx > 0){ idx--; render(); } });
+      var nx = App.el("nextBtn"); if(nx) nx.addEventListener("click", function(){ idx++; render(); window.scrollTo({top:0}); });
+      var fn = App.el("finBtn"); if(fn) fn.addEventListener("click", finish);
+    }
+    function finish(){
+      if(done) return; done = true; clearInterval(timer);
+      var correct = 0, wrong = 0, skip = 0;
+      var rev = questions.map(function(q, i){
+        var a = answers[i] || null, ok = a === q.correct_option;
+        if(a === null) skip++; else if(ok) correct++; else wrong++;
+        return {q:q, a:a, ok:ok};
+      });
+      var marks = correct - wrong * NEG;
+      var pct = Math.round(marks / questions.length * 100);
+      var pass = pct >= PASS;
+      var html = '<div class="result-card"><span class="badge ' + (pass ? "live" : "soon") + '">' + (pass ? "PASSED ✓" : "NOT PASSED") + '</span>'
+        + '<div class="result-score">' + marks.toFixed(2) + ' / ' + questions.length + '</div>'
+        + '<div class="result-meta"><div>Correct<b>' + correct + '</b></div><div>Wrong<b>' + wrong + '</b></div>'
+        + '<div>Skipped<b>' + skip + '</b></div><div>Percentage<b>' + pct + '%</b></div></div>'
+        + '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+        + '<button class="btn btn-amber" id="reBtn">Retake Exam</button>'
+        + '<a class="btn btn-outline" href="subjects.html">Practice Subjects</a></div></div>'
+        + '<div class="review-list">';
+      rev.forEach(function(r, i){
+        var cls = r.a === null ? "sk" : (r.ok ? "ok" : "no");
+        var mark = r.a === null ? "Skipped" : (r.ok ? "✓ Correct" : "✗ Wrong (you: " + r.a + ", answer: " + r.q.correct_option + ")");
+        html += '<div class="review-item"><b>' + (i+1) + '. ' + App.esc(r.q.question) + '</b>'
+          + '<span class="tag ' + cls + '">' + mark + '</span>'
+          + (r.q.explanation ? '<div style="color:var(--muted);margin-top:8px">' + App.esc(r.q.explanation) + '</div>' : '')
+          + '</div>';
+      });
+      box.innerHTML = html + '</div>';
+      window.scrollTo({top:0});
+      App.el("reBtn").addEventListener("click", function(){ App.fetchAll(null, start); });
+    }
+    timer = setInterval(function(){
+      left--;
+      var t = App.el("simTimer");
+      if(t){ t.textContent = "⏱ " + fmt(Math.max(0, left)); if(left < 300) t.classList.add("warn"); }
+      if(left <= 0) finish();
+    }, 1000);
+    render();
+  }
+
+  App.fetchAll(null, start);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subjects | My MCQs — PPSC Test Preparation</title>
+<meta name="description" content="Browse all 10 PPSC subjects on My MCQs — Computer Science, English, Urdu, Islamiyat, Everyday Science, Pak Study, GK, Current Affairs, Math and Past Papers.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar"><div class="wrap bar">
+  <a class="brand" href="index.html"><span class="mark">✓</span><span class="btx">My MCQs<small>PPSC TEST PREPARATION</small></span></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="subjects.html" class="active">Subjects</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="about.html">About</a>
+    <a href="settings.html" class="gear" title="Settings">⚙️</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <p class="eyebrow">Study Library</p>
+  <h1 class="hero">Choose a subject</h1>
+  <p class="sub">Tap any subject to open its practice questions.</p>
+  <div class="slist" id="subjectList"><div class="empty">Loading subjects…</div></div>
+</main>
+
+<footer><div class="wrap foot">
+  <span>© 2026 My MCQs · Free PPSC preparation</span>
+  <nav><a href="subjects.html">Subjects</a><a href="simulator.html">Simulator</a><a href="settings.html">Settings</a><a href="about.html">About</a></nav>
+  <span>Developer: <span class="credit">cos</span> - +923264025618</span>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  App.counts(function(c){
+    var box = App.el("subjectList");
+    box.innerHTML = "";
+    App.SUBJECTS.forEach(function(s){
+      var n = c.by[s.slug] || 0;
+      var a = document.createElement("a");
+      a.className = "srow" + (n ? "" : " dim");
+      a.href = n ? ("practice.html?subject=" + s.slug) : "subjects.html";
+      if(!n) a.onclick = function(e){ e.preventDefault(); };
+      a.innerHTML = '<span class="ric">' + s.icon + '</span>'
+        + '<span class="rtx"><b>' + App.esc(s.name) + '</b><small>' + App.esc(s.desc) + '</small></span>'
+        + '<span class="rcount' + (n ? "" : " zero") + '">' + (n ? n.toLocaleString("en-US") : "Soon") + '</span>'
+        + '<span class="rchev">›</span>';
+      box.appendChild(a);
+    });
+  });
+})();
+</script>
+</body>
+</html>
