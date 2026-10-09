@@ -1,0 +1,8 @@
+# Render static-site blueprint for My MCQs (PPSC-only)
+# Connected repo auto-deploys on every GitHub push.
+services:
+  - type: web
+    name: my-mcqs
+    runtime: static
+    buildCommand: echo "static site - no build needed"
+    staticPublishPath: ./
