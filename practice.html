@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice | My MCQs — PPSC Test Preparation</title>
+<meta name="description" content="Practice PPSC MCQs subject-wise. Attempt first, then reveal answers with explanations.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html"><img src="logo.png" alt="My MCQs logo"></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="subjects.html">Subjects</a>
+      <a href="exam.html" class="nav-cta">Exam Simulator</a>
+      <a href="upload.html">Upload MCQ</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker">Practice Mode</span>
+      <h2 id="quizTitle">Practice</h2>
+      <p>Attempt each question — the answer and explanation reveal after you choose.</p>
+    </div>
+    <div class="quiz-shell" id="quizBox"><div class="empty"><h3>Loading…</h3></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><img src="logo.png" alt="My MCQs logo"><p>Free PPSC test preparation — subject-wise MCQs, past papers and a real exam simulator.</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="subjects.html">Subjects</a></li><li><a href="exam.html">Exam Simulator</a></li><li><a href="upload.html">Upload MCQ</a></li><li><a href="about.html">About Us</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="contact.html">Contact Us</a></li></ul></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 My MCQs. All rights reserved.</span><span>Developer: <span class="credit">cos</span> - +923264025618</span></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/quiz.js"></script>
+<script>MT.startPractice();</script>
+</body>
+</html>

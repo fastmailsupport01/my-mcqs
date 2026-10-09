@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subjects | My MCQs — PPSC Test Preparation</title>
+<meta name="description" content="Browse all 10 PPSC subjects on My MCQs: Computer Science, English, Urdu, Islamiyat, Everyday Science, Pak Study, GK, Current Affairs, Basic Mathematics, Past Papers.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html"><img src="logo.png" alt="My MCQs logo"></a>
+    <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+    <nav class="main-nav" id="mainNav">
+      <a href="index.html">Home</a>
+      <a href="subjects.html">Subjects</a>
+      <a href="exam.html" class="nav-cta">Exam Simulator</a>
+      <a href="upload.html">Upload MCQ</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker">Study Library</span>
+      <h2>All PPSC Subjects</h2>
+      <p>Pick a subject and start practicing. Answers stay hidden until you attempt — just like the real exam.</p>
+    </div>
+    <div class="grid" id="allSubjects"></div>
+  </div>
+</section>
+
+<div class="wrap"><div class="ad-slot"><span>Advertisement</span><div class="ad-note">AdSense ad unit — responsive</div></div></div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand"><img src="logo.png" alt="My MCQs logo"><p>Free PPSC test preparation — subject-wise MCQs, past papers and a real exam simulator.</p></div>
+      <div><h4>Quick Links</h4><ul><li><a href="index.html">Home</a></li><li><a href="subjects.html">Subjects</a></li><li><a href="exam.html">Exam Simulator</a></li><li><a href="upload.html">Upload MCQ</a></li><li><a href="about.html">About Us</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="privacy.html">Privacy Policy</a></li><li><a href="contact.html">Contact Us</a></li></ul></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 My MCQs. All rights reserved.</span><span>Developer: <span class="credit">cos</span> - +923264025618</span></div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  var grid = document.getElementById("allSubjects");
+  var counts = {};
+  function render(){
+    grid.innerHTML = "";
+    MT_SUBJECTS.forEach(function(s){
+      var n = counts[s.slug] || 0;
+      var d = document.createElement("div");
+      d.className = "card";
+      d.innerHTML = '<div class="card-icon">'+s.icon+'</div><h3>'+MT.esc(s.name)+'</h3><p>'+MT.esc(s.desc)+'</p>'
+        + '<div class="meta">'+(n ? '<span class="badge live">'+n+' MCQs</span>' : '<span class="badge soon">Coming soon</span>')+'</div>'
+        + '<a class="btn '+(n?'btn-green':'btn-outline')+'" href="practice.html?subject='+s.slug+'">Practice →</a>';
+      grid.appendChild(d);
+    });
+  }
+  render();
+  if(MT.isConfigured()){
+    MT.supabase().from("mcqs").select("subject_slug,exam_body").then(function(res){
+      if(res.data){ res.data.forEach(function(r){ if(r.exam_body==="ppsc"||!r.exam_body) counts[r.subject_slug]=(counts[r.subject_slug]||0)+1; }); render(); }
+    }).catch(function(){});
+  }
+})();
+</script>
+</body>
+</html>
