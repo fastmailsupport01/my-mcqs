@@ -1,5 +1,6 @@
-/* MCQs Tayyari — Supabase configuration.
-   Project: mcqs-tayyari (Supabase, ap-south-1 Mumbai, Free plan)
-   Values from: Supabase Dashboard → Project Settings → API */
-var SUPABASE_URL = "https://srpgeyrfqhwtszpdzoop.supabase.co";
-var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNycGdleXJmcWh3dHN6cGR6b29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0NjM2NzIsImV4cCI6MjEwNzAzOTY3Mn0.MfbVLFsccY2Y1PaiDdRdex2XtUD9MCyt58-cJJyB-fs";
+/* My MCQs — Supabase configuration.
+   Project: my-mcqs (separate Supabase project — created after David frees a slot)
+   Values from: Supabase Dashboard → Project Settings → API
+   NOTE: placeholder until the new project is created — site shows "coming soon" meanwhile. */
+var SUPABASE_URL = "YOUR_PROJECT_URL";
+var SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
