@@ -3,92 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My MCQs | PPSC Test Preparation 2026 — PPSC MCQs, Past Papers & Simulator</title>
-<meta name="description" content="My MCQs — free PPSC test preparation 2026. Punjab Public Service Commission MCQs, solved past papers, one-paper pattern guide and online practice. Upload your own MCQs. No login required.">
-<meta name="keywords" content="My MCQs, PPSC preparation, PPSC MCQs, PPSC past papers, PPSC one paper, PPSC test preparation 2026, PPSC simulator">
+<title>My MCQs | PPSC Test Preparation 2026 — MCQs, Past Papers, Simulator & Uploads</title>
+<meta name="description" content="My MCQs — free PPSC test preparation 2026. Subject-wise PPSC MCQs, solved past papers, exam simulator and community MCQ uploads. No login required.">
+<meta name="keywords" content="My MCQs, PPSC preparation, PPSC MCQs, PPSC past papers, PPSC one paper, PPSC simulator, upload MCQs">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="My MCQs | PPSC Test Preparation 2026">
-<meta property="og:description" content="Free PPSC preparation: subject-wise MCQs, solved past papers, exam simulator — plus upload your own MCQs.">
+<meta property="og:description" content="Free PPSC preparation: MCQs, past papers, simulator — upload your own MCQs too.">
 <meta property="og:type" content="website">
 <link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
 {"@type":"Question","name":"What is the PPSC one-paper exam pattern?","acceptedAnswer":{"@type":"Answer","text":"The PPSC one-paper exam has 100 MCQs for 100 marks, 90 minutes duration, 40% passing marks, and 0.25 negative marking per wrong answer."}},
 {"@type":"Question","name":"Is My MCQs free?","acceptedAnswer":{"@type":"Answer","text":"Yes, My MCQs is completely free with no login or signup required."}},
-{"@type":"Question","name":"Can I upload my own MCQs?","acceptedAnswer":{"@type":"Answer","text":"Yes — use the Upload MCQ page to submit questions. Every submission is reviewed before it goes live on the site."}},
-{"@type":"Question","name":"Which subjects are covered?","acceptedAnswer":{"@type":"Answer","text":"Computer Science, English, Urdu, Islamiyat, Everyday Science, Pak Study, General Knowledge, Current Affairs, Basic Mathematics and Past Papers."}}
+{"@type":"Question","name":"Can I upload my own MCQs?","acceptedAnswer":{"@type":"Answer","text":"Yes — use the Upload section below to submit questions. Every submission is reviewed before it goes live on the site."}}
 ]}
 </script>
 </head>
 <body>
-<header class="site">
-  <div class="wrap header-inner">
-    <a class="brand" href="index.html" aria-label="My MCQs home"><img src="logo.png" alt="My MCQs logo"></a>
+
+<header class="topbar">
+  <div class="wrap bar-inner">
+    <a class="brand" href="#home"><img src="logo.png" alt="My MCQs logo"></a>
     <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
-    <nav class="main-nav" id="mainNav">
-      <a href="index.html">Home</a>
-      <a href="subjects.html">Subjects</a>
-      <a href="exam.html" class="nav-cta">Exam Simulator</a>
-      <a href="upload.html">Upload MCQ</a>
-      <a href="about.html">About</a>
-      <a href="contact.html">Contact</a>
+    <nav class="topnav" id="mainNav">
+      <a href="#subjects">Subjects</a>
+      <a href="#practice">Practice</a>
+      <a href="#simulator">Simulator</a>
+      <a href="#upload">Upload MCQ</a>
+      <a href="#faq">FAQ</a>
+      <a href="#about">About</a>
     </nav>
   </div>
 </header>
 
-<div class="hero">
+<!-- HERO -->
+<section class="hero" id="home">
   <div class="wrap hero-inner">
-    <span class="hero-badge">PPSC Test Preparation Platform</span>
-    <h1>Prepare Smarter for PPSC</h1>
-    <p>Subject-wise PPSC MCQs, solved past papers, and a real exam simulator — plus upload your own MCQs for the community. Free forever, no login needed.</p>
-    <div class="btn-row">
-      <a class="btn btn-orange" href="exam.html">Start PPSC Simulator</a>
-      <a class="btn btn-ghost" href="subjects.html">Browse Subjects</a>
-      <a class="btn btn-green" href="upload.html">Upload MCQ</a>
+    <span class="pill-badge">★ PPSC Test Preparation Platform</span>
+    <h1>Crack PPSC with <span class="hl">Thousands</span> of Practice MCQs</h1>
+    <p>Subject-wise questions, solved past papers, a real exam simulator — and you can upload your own MCQs for the community. Free forever, no login.</p>
+    <div class="cta-row">
+      <a class="btn btn-amber" href="#simulator">Start PPSC Simulator</a>
+      <a class="btn btn-outline-w" href="#subjects">Browse Subjects</a>
     </div>
-  </div>
-</div>
-
-<section class="block" id="subjects-preview">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="sec-kicker">Study Library</span>
-      <h2>10 Subjects, One Goal — PPSC</h2>
-      <p>Complete PPSC coverage — including Basic Mathematics and solved past papers.</p>
+    <div class="hero-stats">
+      <div class="hstat"><b id="statMcqs">—</b><span>MCQs</span></div>
+      <div class="hstat"><b>10</b><span>Subjects</span></div>
+      <div class="hstat"><b>100</b><span>MCQ Simulator</span></div>
     </div>
-    <div class="grid" id="homeSubjects"></div>
-    <div style="text-align:center;margin-top:34px"><a class="btn btn-green" href="subjects.html">View All Subjects</a></div>
   </div>
 </section>
 
-<div class="wrap"><div class="ad-slot"><span>Advertisement</span><div class="ad-note">AdSense ad unit — 970×250 / responsive</div></div></div>
-
-<section class="block" style="background:var(--bg-soft)">
+<!-- SUBJECTS -->
+<section class="section" id="subjects">
   <div class="wrap">
     <div class="sec-head">
-      <span class="sec-kicker">Contribute</span>
-      <h2>Have PPSC MCQs? Share Them</h2>
-      <p>Upload your MCQs — every submission is reviewed before going live, so the question bank stays accurate.</p>
+      <span class="kicker">Study Library</span>
+      <h2>Pick a Subject, Start Practicing</h2>
+      <p>Tap any subject to load its questions in the practice arena below.</p>
     </div>
-    <div style="text-align:center"><a class="btn btn-orange" href="upload.html">Upload Your MCQs →</a></div>
+    <div class="cards" id="subjectGrid"></div>
   </div>
 </section>
 
-<div class="wrap"><div class="ad-slot"><span>Advertisement</span><div class="ad-note">AdSense ad unit — in-article responsive</div></div></div>
-
-<section class="block">
+<!-- PRACTICE -->
+<section class="section alt" id="practice">
   <div class="wrap">
     <div class="sec-head">
-      <span class="sec-kicker">FAQ</span>
-      <h2>Common Questions</h2>
+      <span class="kicker">Practice Arena</span>
+      <h2 id="quizTitle">Practice MCQs</h2>
+      <p>Choose a subject, attempt each question — answers reveal with explanations.</p>
+    </div>
+    <div class="pill-row" id="practicePills"></div>
+    <div class="stage" id="quizBox"><div class="empty"><h3>Select a subject above to begin</h3><p>Questions load instantly from the live question bank.</p></div></div>
+  </div>
+</section>
+
+<!-- SIMULATOR -->
+<section class="section" id="simulator">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Real Exam Feel</span>
+      <h2>PPSC Practice Simulator</h2>
+      <p>100 random MCQs · 90 minutes · −0.25 negative marking · 40% to pass.</p>
+    </div>
+    <div class="stage" id="examBox"><div class="empty"><h3>Loading simulator…</h3></div></div>
+  </div>
+</section>
+
+<!-- UPLOAD -->
+<section class="section alt" id="upload">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Contribute</span>
+      <h2>Upload Your MCQ</h2>
+      <p>Share PPSC questions with thousands of aspirants. Every submission is <strong>reviewed before going live</strong>.</p>
+    </div>
+    <div class="form-card">
+      <div class="form-msg" id="formMsg"></div>
+      <form id="uploadForm" novalidate>
+        <div class="field">
+          <label for="f_name">Your name <small>(optional)</small></label>
+          <input type="text" id="f_name" maxlength="80" placeholder="e.g. Ali Raza">
+        </div>
+        <div class="field">
+          <label for="f_subject">Subject *</label>
+          <select id="f_subject"><option value="">— Choose subject —</option></select>
+        </div>
+        <div class="field">
+          <label for="f_question">Question *</label>
+          <textarea id="f_question" maxlength="2000" placeholder="Type the MCQ question here…"></textarea>
+        </div>
+        <div class="two-col">
+          <div class="field"><label for="f_a">Option A *</label><input type="text" id="f_a" maxlength="500"></div>
+          <div class="field"><label for="f_b">Option B *</label><input type="text" id="f_b" maxlength="500"></div>
+          <div class="field"><label for="f_c">Option C *</label><input type="text" id="f_c" maxlength="500"></div>
+          <div class="field"><label for="f_d">Option D *</label><input type="text" id="f_d" maxlength="500"></div>
+        </div>
+        <div class="field">
+          <label>Correct answer *</label>
+          <div class="radio-row">
+            <label class="radio-pill"><input type="radio" name="correct" value="A"> A</label>
+            <label class="radio-pill"><input type="radio" name="correct" value="B"> B</label>
+            <label class="radio-pill"><input type="radio" name="correct" value="C"> C</label>
+            <label class="radio-pill"><input type="radio" name="correct" value="D"> D</label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f_explain">Explanation <small>(optional)</small></label>
+          <textarea id="f_explain" maxlength="2000" placeholder="Why is this the correct answer?"></textarea>
+        </div>
+        <button type="submit" class="btn btn-amber btn-wide" id="submitBtn">Submit MCQ</button>
+        <p class="fine">Submissions are reviewed for accuracy before publishing. No login needed.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">Good to Know</span>
+      <h2>Frequently Asked Questions</h2>
     </div>
     <div class="faq">
-      <div class="faq-item"><button class="faq-q">What is the PPSC one-paper exam pattern? <span class="arrow">+</span></button><div class="faq-a"><div>100 MCQs for 100 marks in 90 minutes, with 40% passing marks and 0.25 negative marking per wrong answer.</div></div></div>
-      <div class="faq-item"><button class="faq-q">Is My MCQs really free? <span class="arrow">+</span></button><div class="faq-a"><div>Yes — completely free, no login or signup required. Open the site and start practicing.</div></div></div>
-      <div class="faq-item"><button class="faq-q">Can I upload my own MCQs? <span class="arrow">+</span></button><div class="faq-a"><div>Yes! Use the Upload MCQ page. Every submission is reviewed for accuracy before it appears on the site.</div></div></div>
-      <div class="faq-item"><button class="faq-q">Do you have Basic Mathematics? <span class="arrow">+</span></button><div class="faq-a"><div>Yes — Basic Mathematics is a full subject here, since PPSC allocates 5–15 marks to it. Many competitors skip it entirely.</div></div></div>
-      <div class="faq-item"><button class="faq-q">How is this different from other MCQ sites? <span class="arrow">+</span></button><div class="faq-a"><div>A true PPSC simulator with timer and negative marking, explanations for every answer, hidden answers in practice mode, community MCQ uploads, and fresh regularly-updated content.</div></div></div>
+      <div class="faq-item"><button class="faq-q">What is the PPSC one-paper exam pattern? <span>+</span></button><div class="faq-a"><div>100 MCQs for 100 marks in 90 minutes, with 40% passing marks and 0.25 negative marking per wrong answer.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Is My MCQs really free? <span>+</span></button><div class="faq-a"><div>Yes — completely free, no login or signup required.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Can I upload my own MCQs? <span>+</span></button><div class="faq-a"><div>Yes! Use the Upload section above. Every submission is reviewed for accuracy before it appears on the site.</div></div></div>
+      <div class="faq-item"><button class="faq-q">Do you have Basic Mathematics? <span>+</span></button><div class="faq-a"><div>Yes — PPSC allocates 5–15 marks to it, and many competitors skip it entirely.</div></div></div>
+      <div class="faq-item"><button class="faq-q">How is this different from other MCQ sites? <span>+</span></button><div class="faq-a"><div>A true PPSC simulator with timer and negative marking, explanations for every answer, hidden answers in practice, community uploads, and fresh content.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section alt" id="about">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kicker">About</span>
+      <h2>About My MCQs</h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>Our Mission</h3>
+        <p><strong>My MCQs</strong> is a free PPSC test-preparation platform. We organize subject-wise multiple-choice questions aligned with the PPSC one-paper pattern — 100 MCQs, 90 minutes, negative marking — so aspirants practice exactly what the exam demands. Anyone can also contribute questions through the Upload section; every submission is reviewed before going live.</p>
+        <p class="fine">My MCQs is an independent educational platform, not affiliated with or endorsed by PPSC or any government body.</p>
+      </div>
+      <div class="about-card">
+        <h3>Contact</h3>
+        <p>Questions, corrections or bulk question submissions:</p>
+        <p class="contact-line">📞 <strong>+923264025618</strong></p>
+        <h3 style="margin-top:22px">Privacy</h3>
+        <p class="fine">No accounts, no tracking profiles. Practice progress stays in your own browser (local storage). Uploaded MCQs store only the question content and the optional name you provide.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -98,18 +190,18 @@
     <div class="foot-grid">
       <div class="foot-brand">
         <img src="logo.png" alt="My MCQs logo">
-        <p>Free PPSC test preparation — subject-wise MCQs, past papers, exam simulator and community uploads.</p>
+        <p>Free PPSC test preparation — MCQs, past papers, simulator and community uploads.</p>
       </div>
-      <div><h4>Quick Links</h4><ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="subjects.html">Subjects</a></li>
-        <li><a href="exam.html">Exam Simulator</a></li>
-        <li><a href="upload.html">Upload MCQ</a></li>
-        <li><a href="about.html">About Us</a></li>
+      <div><h4>Explore</h4><ul>
+        <li><a href="#subjects">Subjects</a></li>
+        <li><a href="#practice">Practice</a></li>
+        <li><a href="#simulator">Simulator</a></li>
+        <li><a href="#upload">Upload MCQ</a></li>
       </ul></div>
-      <div><h4>Legal</h4><ul>
-        <li><a href="privacy.html">Privacy Policy</a></li>
-        <li><a href="contact.html">Contact Us</a></li>
+      <div><h4>Info</h4><ul>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#about">About & Contact</a></li>
+        <li><a href="#about">Privacy</a></li>
       </ul></div>
     </div>
     <div class="foot-bottom">
@@ -121,30 +213,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
-<script src="js/app.js"></script>
-<script>
-(function(){
-  var grid = document.getElementById("homeSubjects");
-  var counts = {};
-  function render(list){
-    grid.innerHTML = "";
-    list.slice(0,6).forEach(function(s){
-      var d = document.createElement("div");
-      d.className = "card";
-      d.innerHTML = '<div class="card-icon">'+s.icon+'</div><h3>'+MT.esc(s.name)+'</h3><p>'+MT.esc(s.desc)+'</p>'
-        + '<div class="meta">'+(counts[s.slug] ? counts[s.slug]+" MCQs available" : "MCQs coming soon")+'</div>'
-        + '<a class="btn btn-outline" href="practice.html?subject='+s.slug+'">Practice →</a>';
-      grid.appendChild(d);
-    });
-  }
-  render(MT_SUBJECTS);
-  if(MT.isConfigured()){
-    MT.supabase().from("mcqs").select("subject_slug,exam_body").then(function(res){
-      if(res.data){ res.data.forEach(function(r){ if(r.exam_body==="ppsc"||!r.exam_body) counts[r.subject_slug]=(counts[r.subject_slug]||0)+1; }); render(MT_SUBJECTS); }
-    }).catch(function(){});
-  }
-})();
-</script>
-
+<script src="js/site.js"></script>
 </body>
 </html>
