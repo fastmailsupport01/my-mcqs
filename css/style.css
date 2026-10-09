@@ -11,7 +11,7 @@
   --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme="light"]){
     --bg:#0c1a12; --surface:#12241a; --surface-2:#1a3325;
     --ink:#eaf7ee; --muted:#9fb8a8; --line:#24402f;
     --primary:#4ade80; --primary-strong:#86efac; --primary-soft:#143d24;
@@ -20,6 +20,15 @@
     --correct:#5fd68a; --correct-soft:#173f28;
     --shadow:0 16px 40px rgba(0,0,0,.30);
   }
+}
+:root[data-theme="dark"]{
+    --bg:#0c1a12; --surface:#12241a; --surface-2:#1a3325;
+    --ink:#eaf7ee; --muted:#9fb8a8; --line:#24402f;
+    --primary:#4ade80; --primary-strong:#86efac; --primary-soft:#143d24;
+    --amber:#fbbf24; --amber-soft:#4a3a12;
+    --danger:#ff8d85; --danger-soft:#4a2827;
+    --correct:#5fd68a; --correct-soft:#173f28;
+    --shadow:0 16px 40px rgba(0,0,0,.30);
 }
 *{box-sizing:border-box}
 html{-webkit-tap-highlight-color:transparent}
@@ -41,6 +50,8 @@ main.wrap{padding:26px 0 60px}
 .nav a:hover{background:var(--surface-2);color:var(--ink)}
 .nav a.active{background:var(--primary-soft);color:var(--primary-strong)}
 .nav a.gear{font-size:1.15rem;padding:8px 10px}
+.nav .tbtn{background:none;border:0;cursor:pointer;font-size:1.15rem;padding:8px 10px;border-radius:10px;line-height:1}
+.nav .tbtn:hover{background:var(--surface-2)}
 
 /* ---------- hero ---------- */
 .eyebrow{color:var(--primary);font-size:.76rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin:6px 0}
