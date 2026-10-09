@@ -77,4 +77,27 @@
     var order = App.shuffle(letters);
     return {order:order, texts:texts, answer:m.correct_option};
   };
+
+  /* ---------- theme toggle (light/dark) ---------- */
+  App.currentTheme = function(){
+    var t = document.documentElement.getAttribute("data-theme");
+    if(t === "light" || t === "dark") return t;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  };
+  App.applyThemeIcon = function(){
+    var dark = App.currentTheme() === "dark";
+    var btns = document.querySelectorAll(".tbtn");
+    for(var i = 0; i < btns.length; i++){
+      btns[i].textContent = dark ? "\u2600\uFE0F" : "\uD83C\uDF19";
+      btns[i].title = dark ? "Light mode" : "Dark mode";
+    }
+  };
+  App.toggleTheme = function(){
+    var next = App.currentTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try{ localStorage.setItem("mm-theme", next); }catch(e){}
+    App.applyThemeIcon();
+  };
+  if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", App.applyThemeIcon);
+  else App.applyThemeIcon();
 })();
