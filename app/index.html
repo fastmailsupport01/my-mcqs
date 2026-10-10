@@ -74,6 +74,7 @@
     .eyebrow { color: var(--primary); font-size: .76rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin: 0 0 6px; }
     h1.hero-title { font-size: clamp(1.7rem, 7vw, 2.4rem); line-height: 1.08; letter-spacing: -.03em; margin: 0 0 8px; }
     .hero-sub { color: var(--muted); font-size: .95rem; margin: 0 0 20px; }
+    .back-link { display: inline-block; margin: 0 0 16px; color: var(--primary); font-weight: 700; font-size: .9rem; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
 
     .section-head { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 0 12px; }
     .section-head h2 { font-size: 1.05rem; margin: 0; letter-spacing: -.02em; }
@@ -300,9 +301,19 @@
     <section id="screen-subjects" class="screen" aria-label="Subjects">
       <p class="eyebrow">Study Library</p>
       <h1 class="hero-title">Choose a subject</h1>
-      <p class="hero-sub">Tap any subject to open its practice questions.</p>
+      <p class="hero-sub">Tap any subject to see its practice papers.</p>
       <div class="slist" id="subjectList">
         <div class="loading-card"><div class="spinner"></div>Loading subjects…</div>
+      </div>
+    </section>
+
+    <!-- PAPERS -->
+    <section id="screen-papers" class="screen" aria-label="Practice papers">
+      <p class="eyebrow">Practice Papers</p>
+      <h1 class="hero-title" id="papersTitle">Papers</h1>
+      <p class="hero-sub">Each paper has 20 MCQs. Pick one to start.</p>
+      <div class="slist" id="papersList">
+        <div class="loading-card"><div class="spinner"></div>Loading papers…</div>
       </div>
     </section>
 
@@ -515,8 +526,8 @@
       document.querySelectorAll(".screen").forEach(function(s){
         s.classList.toggle("active", s.id === id);
       });
-      // practice is a drill-down from Subjects — highlight the Subjects tab for it
-      var tabId = (id === "screen-practice") ? "screen-subjects" : id;
+      // practice and papers are drill-downs from Subjects — highlight the Subjects tab for them
+      var tabId = (id === "screen-practice" || id === "screen-papers") ? "screen-subjects" : id;
       document.querySelectorAll(".tab").forEach(function(t){
         t.classList.toggle("active", t.getAttribute("data-screen") === tabId);
       });
@@ -577,7 +588,7 @@
         var b = document.createElement("button");
         b.className = "srow" + (x.n ? "" : " dim");
         b.innerHTML = subjectRowHTML(x.s, x.n);
-        if(x.n) b.addEventListener("click", function(){ openPractice(x.s.slug); });
+        if(x.n) b.addEventListener("click", function(){ openPapers(x.s.slug); });
         box.appendChild(b);
       });
     }
@@ -595,16 +606,58 @@
         var b = document.createElement("button");
         b.className = "srow" + (n ? "" : " dim");
         b.innerHTML = subjectRowHTML(s, n);
-        if(n) b.addEventListener("click", function(){ openPractice(s.slug); });
+        if(n) b.addEventListener("click", function(){ openPapers(s.slug); });
+        box.appendChild(b);
+      });
+    }
+
+    /* ---------- Papers: 20-MCQ papers per subject ---------- */
+    var PAPER_SIZE = 20;
+    var PAPERS = { slug:null, chunks:[] };
+
+    function openPapers(slug){
+      PAPERS.slug = slug;
+      renderPapers();
+      showScreen("screen-papers");
+    }
+
+    function renderPapers(){
+      var box = el("papersList");
+      var meta = null;
+      SUBJECTS.forEach(function(s){ if(s.slug === PAPERS.slug) meta = s; });
+      el("papersTitle").textContent = (meta ? meta.name : "Subject") + " — Papers";
+      if(!dataReady){
+        box.innerHTML = '<div class="loading-card"><div class="spinner"></div>Loading papers…</div>';
+        return;
+      }
+      var list = ALL_MCQS.filter(function(m){ return m.subject_slug === PAPERS.slug; });
+      box.innerHTML = "";
+      if(!list.length){
+        box.innerHTML = '<div class="loading-card">No MCQs for this subject yet — check back soon.</div>';
+        return;
+      }
+      PAPERS.chunks = [];
+      for(var i = 0; i < list.length; i += PAPER_SIZE) PAPERS.chunks.push(list.slice(i, i + PAPER_SIZE));
+      PAPERS.chunks.forEach(function(chunk, idx){
+        var b = document.createElement("button");
+        b.className = "srow";
+        b.innerHTML = '<span class="ric">📝</span>'
+          + '<span class="rtx"><b>Paper ' + (idx + 1) + '</b><small>Questions ' + (idx * PAPER_SIZE + 1) + '–' + (idx * PAPER_SIZE + chunk.length) + '</small></span>'
+          + '<span class="rcount">' + chunk.length + ' MCQs</span>'
+          + '<span class="rchev">›</span>';
+        (function(n){
+          b.addEventListener("click", function(){ openPractice(PAPERS.slug, n); });
+        })(idx + 1);
         box.appendChild(b);
       });
     }
 
     /* ---------- Practice: 20 per page, numbered pagination ---------- */
-    var PR = { slug:null, questions:[], qopts:[], answers:{}, page:1, perPage:20 };
+    var PR = { slug:null, paper:null, questions:[], qopts:[], answers:{}, page:1, perPage:20 };
 
-    function openPractice(slug){
+    function openPractice(slug, paper){
       PR.slug = slug || PR.slug || SUBJECTS[0].slug;
+      PR.paper = paper || null;
       el("practiceSubject").value = PR.slug;
       startPractice();
       showScreen("screen-practice");
@@ -618,12 +671,20 @@
       }
       var list = ALL_MCQS.filter(function(m){ return m.subject_slug === PR.slug; });
       var meta = SUBJECTS.filter(function(s){ return s.slug === PR.slug; })[0];
-      el("practiceTitle").textContent = (meta ? meta.name : "Practice") + " — Practice";
       if(!list.length){
+        el("practiceTitle").textContent = (meta ? meta.name : "Practice") + " — Practice";
         box.innerHTML = '<div class="loading-card">No MCQs for this subject yet — check back soon.</div>';
         return;
       }
-      PR.questions = shuffle(list);
+      if(PR.paper){
+        var totalPapers = Math.max(1, Math.ceil(list.length / PR.perPage));
+        if(PR.paper > totalPapers) PR.paper = totalPapers;
+        PR.questions = list.slice((PR.paper - 1) * PR.perPage, PR.paper * PR.perPage);
+        el("practiceTitle").textContent = (meta ? meta.name : "Practice") + " — Paper " + PR.paper;
+      } else {
+        PR.questions = shuffle(list);
+        el("practiceTitle").textContent = (meta ? meta.name : "Practice") + " — Practice";
+      }
       PR.qopts = PR.questions.map(toOptions);
       PR.answers = {};
       PR.page = 1;
@@ -668,7 +729,8 @@
       var start = (PR.page - 1) * PR.perPage;
       var s = prScore();
 
-      var html = '<div class="score-strip">'
+      var html = (PR.paper ? '<button class="back-link" id="paperBack">← Papers</button>' : '')
+        + '<div class="score-strip">'
         + '<div class="chip">Attempted<b>' + s.a + '</b></div>'
         + '<div class="chip">Correct<b>' + s.c + '</b></div>'
         + '<div class="chip">Total MCQs<b>' + total.toLocaleString() + '</b></div>'
@@ -685,18 +747,23 @@
         html += '</div><div class="explain"></div></div>';
       }
 
-      html += '<div class="pager">';
-      html += '<button class="pg-btn" data-pg="' + (PR.page - 1) + '"' + (PR.page === 1 ? ' disabled' : '') + '>‹</button>';
-      pageNums(PR.page, totalPages).forEach(function(n){
-        if(n === "…") html += '<span class="pg-dots">…</span>';
-        else html += '<button class="pg-btn' + (n === PR.page ? ' active' : '') + '" data-pg="' + n + '">' + n + '</button>';
-      });
-      html += '<button class="pg-btn" data-pg="' + (PR.page + 1) + '"' + (PR.page === totalPages ? ' disabled' : '') + '>›</button>';
-      html += '</div>';
-      html += '<div class="pg-goto"><input type="number" id="pgInput" min="1" max="' + totalPages + '" placeholder="Go to page">'
-        + '<button class="btn btn-primary" id="pgGo">Go</button></div>';
+      if(totalPages > 1){
+        html += '<div class="pager">';
+        html += '<button class="pg-btn" data-pg="' + (PR.page - 1) + '"' + (PR.page === 1 ? ' disabled' : '') + '>‹</button>';
+        pageNums(PR.page, totalPages).forEach(function(n){
+          if(n === "…") html += '<span class="pg-dots">…</span>';
+          else html += '<button class="pg-btn' + (n === PR.page ? ' active' : '') + '" data-pg="' + n + '">' + n + '</button>';
+        });
+        html += '<button class="pg-btn" data-pg="' + (PR.page + 1) + '"' + (PR.page === totalPages ? ' disabled' : '') + '>›</button>';
+        html += '</div>';
+        html += '<div class="pg-goto"><input type="number" id="pgInput" min="1" max="' + totalPages + '" placeholder="Go to page">'
+          + '<button class="btn btn-primary" id="pgGo">Go</button></div>';
+      }
 
       box.innerHTML = html;
+
+      var backBtn = el("paperBack");
+      if(backBtn) backBtn.addEventListener("click", function(){ openPapers(PR.slug); });
 
       box.querySelectorAll(".q-card").forEach(function(card){
         var qi = parseInt(card.getAttribute("data-qi"), 10);
@@ -721,7 +788,8 @@
           }
         });
       });
-      el("pgGo").addEventListener("click", function(){
+      var pgGoBtn = el("pgGo");
+      if(pgGoBtn) pgGoBtn.addEventListener("click", function(){
         var v = parseInt(el("pgInput").value, 10);
         if(v >= 1 && v <= totalPages && v !== PR.page){
           PR.page = v; renderPractice(); window.scrollTo(0, 0);
@@ -736,7 +804,7 @@
         o.value = s.slug; o.textContent = s.name;
         sel.appendChild(o);
       });
-      sel.addEventListener("change", function(){ PR.slug = sel.value; startPractice(); });
+      sel.addEventListener("change", function(){ PR.slug = sel.value; PR.paper = null; startPractice(); });
     })();
 
     /* ---------- PPSC Exam Simulator ---------- */
