@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Practice Papers | My MCQs — PPSC Test Preparation</title>
+<meta name="description" content="Subject-wise 20-MCQ practice papers for PPSC test preparation on My MCQs.">
+<meta name="robots" content="index, follow">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem("mm-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+<header class="topbar"><div class="wrap bar">
+  <a class="brand" href="index.html"><span class="mark">✓</span><span class="btx">My MCQs<small>PPSC TEST PREPARATION</small></span></a>
+  <nav class="nav">
+    <a href="index.html">Home</a>
+    <a href="subjects.html" class="active">Subjects</a>
+    <a href="simulator.html">Simulator</a>
+    <a href="about.html">About</a>
+    <button class="tbtn" onclick="App.toggleTheme()" title="Dark mode">🌙</button>
+    <a href="settings.html" class="gear" title="Settings">⚙️</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <p class="eyebrow">Practice Papers</p>
+  <h1 class="hero" id="ppTitle">Papers</h1>
+  <p class="sub">Each paper has 20 MCQs. Pick one to start.</p>
+  <p><a class="back-link" href="subjects.html">← All subjects</a></p>
+  <div class="slist" id="paperList"><div class="empty">Loading papers…</div></div>
+</main>
+
+<footer><div class="wrap foot">
+  <span>© 2026 My MCQs · Free PPSC preparation</span>
+  <nav><a href="subjects.html">Subjects</a><a href="simulator.html">Simulator</a><a href="settings.html">Settings</a><a href="about.html">About</a></nav>
+  <span class="dev-credit"><img src="img/cos-logo.jpg" alt="COS logo" class="dev-logo">Developer: <span class="credit">cos</span> - +923264025618</span>
+</div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function(){
+  var PER = 20;
+  var slug = new URLSearchParams(location.search).get("subject") || "";
+  var meta = App.SUBJECTS.find(function(s){ return s.slug === slug; });
+  if(!meta){ location.replace("subjects.html"); return; }
+  App.el("ppTitle").textContent = meta.name + " — Papers";
+  document.title = meta.name + " Practice Papers | My MCQs";
+  App.fetchAll(slug, function(data){
+    var box = App.el("paperList");
+    if(!data.length){
+      box.innerHTML = '<div class="empty"><h3>MCQs coming soon</h3><p>Questions for this subject are being added.</p></div>';
+      return;
+    }
+    var total = Math.ceil(data.length / PER), html = "";
+    for(var i = 0; i < total; i++){
+      var n = Math.min(PER, data.length - i * PER);
+      html += '<a class="srow" href="practice.html?subject=' + encodeURIComponent(slug) + '&paper=' + (i + 1) + '">'
+        + '<span class="ric">📝</span>'
+        + '<span class="rtx"><b>Paper ' + (i + 1) + '</b><small>Questions ' + (i * PER + 1) + '–' + (i * PER + n) + '</small></span>'
+        + '<span class="rcount">' + n + ' MCQs</span>'
+        + '<span class="rchev">›</span></a>';
+    }
+    box.innerHTML = html;
+  });
+})();
+</script>
+</body>
+</html>

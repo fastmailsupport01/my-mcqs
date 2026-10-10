@@ -44,30 +44,41 @@
 <script src="js/app.js"></script>
 <script>
 (function(){
+  var PER = 20;
   var sel = App.el("pSubject"), box = App.el("pBox");
-  var qs = new URLSearchParams(location.search).get("subject") || "";
+  var params = new URLSearchParams(location.search);
+  var qs = params.get("subject") || "";
+  var paperNo = parseInt(params.get("paper") || "0", 10) || 0;
   App.SUBJECTS.forEach(function(s){
     var o = document.createElement("option");
     o.value = s.slug; o.textContent = s.name;
     if(s.slug === qs) o.selected = true;
     sel.appendChild(o);
   });
-  sel.addEventListener("change", function(){ load(sel.value); });
+  sel.addEventListener("change", function(){ paperNo = parseInt(new URLSearchParams(location.search).get("paper") || "0", 10) || 0; load(sel.value); });
 
   function meta(slug){ return App.SUBJECTS.find(function(s){ return s.slug === slug; }); }
   function load(slug){
     var m = meta(slug);
-    App.el("pTitle").textContent = (m ? m.name : "Practice") + " — Practice";
     box.innerHTML = '<div class="empty">Loading questions…</div>';
     App.fetchAll(slug, function(data){
       if(!data.length){
+        App.el("pTitle").textContent = (m ? m.name : "Practice") + " — Practice";
         box.innerHTML = '<div class="empty"><h3>MCQs coming soon</h3><p>Questions for this subject are being added.</p></div>';
         return;
       }
-      run(App.shuffle(data));
+      var paperMode = false, chunk = data;
+      if(paperNo > 0){
+        var totalPapers = Math.ceil(data.length / PER);
+        if(paperNo > totalPapers) paperNo = totalPapers;
+        chunk = data.slice((paperNo - 1) * PER, paperNo * PER);
+        paperMode = true;
+      }
+      App.el("pTitle").textContent = (m ? m.name : "Practice") + (paperMode ? " — Paper " + paperNo : " — Practice");
+      run(paperMode ? chunk : App.shuffle(chunk), paperMode, slug);
     });
   }
-  function run(questions){
+  function run(questions, paperMode, slug){
     var perPage = 20, page = 1, answers = {};
     var totalPages = Math.max(1, Math.ceil(questions.length / perPage));
     var qopts = questions.map(App.toOptions);
@@ -86,7 +97,8 @@
     }
     function render(){
       var s = score(), start = (page - 1) * perPage;
-      var html = '<div class="score-strip"><div class="chip">Attempted<b>' + s.a + '</b></div>'
+      var html = (paperMode ? '<p><a class="back-link" href="papers.html?subject=' + encodeURIComponent(slug) + '">← All papers</a></p>' : '')
+        + '<div class="score-strip"><div class="chip">Attempted<b>' + s.a + '</b></div>'
         + '<div class="chip">Correct<b>' + s.c + '</b></div>'
         + '<div class="chip">Total MCQs<b>' + questions.length + '</b></div></div>';
       questions.slice(start, start + perPage).forEach(function(m, k){
@@ -106,12 +118,14 @@
           + (picked ? "<strong>Explanation:</strong> " + App.esc(m.explanation || ("Correct answer is option " + m.correct_option + ".")) : "")
           + '</div></div>';
       });
-      html += '<div class="pager">';
-      pageNums(page, totalPages).forEach(function(p){
-        if(p === "…"){ html += '<span class="pg-btn" style="border:0;background:none;cursor:default">…</span>'; }
-        else html += '<button class="pg-btn' + (p === page ? " active" : "") + '" data-pg="' + p + '">' + p + '</button>';
-      });
-      html += '</div>';
+      if(totalPages > 1){
+        html += '<div class="pager">';
+        pageNums(page, totalPages).forEach(function(p){
+          if(p === "…"){ html += '<span class="pg-btn" style="border:0;background:none;cursor:default">…</span>'; }
+          else html += '<button class="pg-btn' + (p === page ? " active" : "") + '" data-pg="' + p + '">' + p + '</button>';
+        });
+        html += '</div>';
+      }
       box.innerHTML = html;
       box.querySelectorAll(".opt").forEach(function(b){
         b.addEventListener("click", function(){

@@ -26,7 +26,7 @@
 <main class="wrap">
   <p class="eyebrow">Study Library</p>
   <h1 class="hero">Choose a subject</h1>
-  <p class="sub">Tap any subject to open its practice questions.</p>
+  <p class="sub">Tap any subject to see its practice papers.</p>
   <div class="slist" id="subjectList"><div class="empty">Loading subjects…</div></div>
 </main>
 
@@ -48,7 +48,7 @@
       var n = c.by[s.slug] || 0;
       var a = document.createElement("a");
       a.className = "srow" + (n ? "" : " dim");
-      a.href = n ? ("practice.html?subject=" + s.slug) : "subjects.html";
+      a.href = n ? ("papers.html?subject=" + s.slug) : "subjects.html";
       if(!n) a.onclick = function(e){ e.preventDefault(); };
       a.innerHTML = '<span class="ric">' + s.icon + '</span>'
         + '<span class="rtx"><b>' + App.esc(s.name) + '</b><small>' + App.esc(s.desc) + '</small></span>'
